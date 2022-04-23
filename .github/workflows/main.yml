@@ -1,0 +1,19 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment:
+      name: Heroku
+    steps:
+      - uses: actions/checkout@v2
+      - uses: CDNievas/heroku-action@v1.0 # This is the action
+        with:
+          heroku_email: "mail@rickvanloon.nl"
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: "rickvanloon-p4"
