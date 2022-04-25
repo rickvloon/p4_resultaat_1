@@ -15,6 +15,13 @@ app.get('/api/user', (req, res) => {
     });
 });
 
+app.get('/api/user/profile', (req, res) => {
+    res.status(401).json({
+        statusCode: 401,
+        error: "Functionality has not been implemented yet."
+    });
+});
+
 app.get('/api/user/:id', (req, res) => {
     database.retrieveUser(req.params.id, (result) => {
         res.status(200).json({
