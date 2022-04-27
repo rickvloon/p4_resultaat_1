@@ -28,7 +28,7 @@ module.exports = {
         }
     },
 
-    retrieveUser(id, callback) {
+    getUser(id, callback) {
         setTimeout(() => {
             callback(userDB.find((user) => user.id == id) ?? {});
         }, timeout);
