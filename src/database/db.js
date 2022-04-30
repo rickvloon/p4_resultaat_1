@@ -11,8 +11,6 @@ module.exports = {
 
     createUser(user, callback) {
         if (
-            !user ||
-            !user.emailAdress ||
             userDB.filter((item) => item.emailAdress === user.emailAdress).length > 0
         ) {
             const error = 'A user with this email is already registered.';
