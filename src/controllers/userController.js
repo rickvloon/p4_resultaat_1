@@ -1,4 +1,5 @@
 const database = require('../database/db');
+const Joi = require('joi');
 
 module.exports = {
     listUsers: (req, res) => {
@@ -72,5 +73,31 @@ module.exports = {
                 });
             }
         });
+    },
+
+    validateUser: (req, res, next) => {
+        const user = req.body;
+
+        const userSchema = Joi.object({
+            firstName: Joi.string(),
+            lastName: Joi.string(),
+            street: Joi.string(),
+            city: Joi.string(),
+            emailAddress: Joi.string()
+                .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'nl', 'eu'] } }),
+            password: Joi.string()
+                .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+        });
+
+        const { error } = userSchema.validate(user);
+        console.log(error.details);
+        if (error) {
+            res.status(400).json({
+                status: 400,
+                result: error
+            });
+        } else {
+            next();
+        }
     }
 }
