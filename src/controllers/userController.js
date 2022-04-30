@@ -11,13 +11,13 @@ module.exports = {
         });
     },
 
-    createUser: (req, res) => {
+    createUser: (req, res, next) => {
         database.createUser(req.body, (error, result) => {
             if (error) {
-                res.status(400).json({
+                next({
                     statusCode: 400,
                     error
-                });
+                })
             } else {
                 res.status(200).json({
                     statusCode: 200,
@@ -90,11 +90,10 @@ module.exports = {
         });
 
         const { error } = userSchema.validate(user);
-        console.log(error.details);
         if (error) {
-            res.status(400).json({
-                status: 400,
-                result: error
+            next({
+                status: 404,
+                error: error.details[0].message
             });
         } else {
             next();

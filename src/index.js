@@ -14,7 +14,11 @@ app.use('*', (req, res) => {
         status: 401,
         result: 'End-point not found',
     })
-})
+});
+
+app.use((error, req, res, next) => {
+    res.status(error.statusCode).json(error);
+});
 
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`)
