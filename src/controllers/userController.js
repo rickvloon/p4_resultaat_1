@@ -1,11 +1,27 @@
+const assert = require('assert');
 const database = require('../database/db');
-const Joi = require('joi');
 
 module.exports = {
+    validateUser: (req, res, next) => {
+        const user = req.body;
+        const { email, password } = user;
+
+        try {
+            assert(typeof email === 'string', 'Email must be a string');
+            assert(typeof password === 'string', 'Password must be a string');
+            next();
+        } catch (err) {
+            next({
+                status: 400,
+                result: err.message
+            });
+        }
+    },
+
     listUsers: (req, res) => {
         database.listUsers((result) => {
             res.status(200).json({
-                statusCode: 200,
+                status: 200,
                 result
             });
         });
@@ -15,12 +31,12 @@ module.exports = {
         database.createUser(req.body, (error, result) => {
             if (error) {
                 next({
-                    statusCode: 400,
-                    error
+                    status: 400,
+                    result: error
                 });
             } else {
                 res.status(200).json({
-                    statusCode: 200,
+                    status: 200,
                     result
                 });
             }
@@ -29,15 +45,15 @@ module.exports = {
 
     getUserProfile: (req, res) => {
         next({
-            statusCode: 400,
-            error: 'Functionality has not been implemented yet.'
+            status: 400,
+            result: 'Functionality has not been implemented yet.'
         });
     },
 
     getUser: (req, res) => {
         database.getUser(req.params.id, (result) => {
             res.status(200).json({
-                statusCode: 200,
+                status: 200,
                 result
             });
         });
@@ -47,12 +63,12 @@ module.exports = {
         database.updateUser(req.body, req.params.id, (error, result) => {
             if (error) {
                 next({
-                    statusCode: 400,
-                    error
+                    status: 400,
+                    result: error
                 });
             } else {
                 res.status(200).json({
-                    statusCode: 200,
+                    status: 200,
                     result
                 });
             }
@@ -63,40 +79,15 @@ module.exports = {
         database.deleteUser(req.params.id, (error, result) => {
             if (error) {
                 next({
-                    statusCode: 400,
-                    error
+                    status: 400,
+                    result: error
                 });
             } else {
                 res.status(200).json({
-                    statusCode: 200,
+                    status: 200,
                     result
                 });
             }
         });
-    },
-
-    validateUser: (req, res, next) => {
-        const user = req.body;
-
-        const userSchema = Joi.object({
-            firstName: Joi.string(),
-            lastName: Joi.string(),
-            street: Joi.string(),
-            city: Joi.string(),
-            emailAddress: Joi.string()
-                .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'nl', 'eu'] } }),
-            password: Joi.string()
-                .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-        });
-
-        const { error } = userSchema.validate(user);
-        if (error) {
-            next({
-                status: 404,
-                error: error.details[0].message
-            });
-        } else {
-            next();
-        }
     }
 }

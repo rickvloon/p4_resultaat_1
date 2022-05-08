@@ -17,9 +17,11 @@ app.use('*', (req, res) => {
 });
 
 app.use((error, req, res, next) => {
-    res.status(error.statusCode).json(error);
+    res.status(error.status).json(error);
 });
 
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`)
 });
+
+module.exports = app;
