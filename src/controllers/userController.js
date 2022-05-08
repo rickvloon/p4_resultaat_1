@@ -1,28 +1,49 @@
-const assert = require('assert');
-const database = require('../database/db');
+const database = require("../database/db");
+const Joi = require("joi");
 
 module.exports = {
     validateUser: (req, res, next) => {
         const user = req.body;
-        const { email, password } = user;
 
-        try {
-            assert(typeof email === 'string', 'Email must be a string');
-            assert(typeof password === 'string', 'Password must be a string');
-            next();
-        } catch (err) {
+        const schema = Joi.object({
+            password: Joi.string()
+                .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+                .required()
+                .messages({
+                    "string.base": "password should be a string",
+                    "any.required": "password is a required field",
+                    "string.pattern.base": "password must be a valid password",
+                }),
+            emailAddress: Joi.string()
+                .email({
+                    minDomainSegments: 2,
+                    tlds: { allow: ["com", "net", "eu", "nl"] },
+                })
+                .required()
+                .messages({
+                    "string.base": "emailAddress should be a string",
+                    "any.required": "emailAddress is a required field",
+                    "string.email": "emailAddress must be a valid email",
+                }),
+        }).unknown(true);
+
+        const { error } = schema.validate(user);
+
+        if (error) {
             next({
-                status: 400,
-                result: err.message
+                statusCode: 400,
+                result: error.message,
             });
+        } else {
+            next();
         }
     },
 
     listUsers: (req, res) => {
         database.listUsers((result) => {
             res.status(200).json({
-                status: 200,
-                result
+                statusCode: 200,
+                result,
             });
         });
     },
@@ -31,13 +52,13 @@ module.exports = {
         database.createUser(req.body, (error, result) => {
             if (error) {
                 next({
-                    status: 400,
-                    result: error
+                    statusCode: 400,
+                    result: error,
                 });
             } else {
                 res.status(200).json({
-                    status: 200,
-                    result
+                    statusCode: 200,
+                    result,
                 });
             }
         });
@@ -46,15 +67,15 @@ module.exports = {
     getUserProfile: (req, res) => {
         next({
             status: 400,
-            result: 'Functionality has not been implemented yet.'
+            result: "Functionality has not been implemented yet.",
         });
     },
 
     getUser: (req, res) => {
         database.getUser(req.params.id, (result) => {
             res.status(200).json({
-                status: 200,
-                result
+                statusCode: 200,
+                result,
             });
         });
     },
@@ -63,13 +84,13 @@ module.exports = {
         database.updateUser(req.body, req.params.id, (error, result) => {
             if (error) {
                 next({
-                    status: 400,
-                    result: error
+                    statusCode: 400,
+                    result: error,
                 });
             } else {
                 res.status(200).json({
-                    status: 200,
-                    result
+                    statusCode: 200,
+                    result,
                 });
             }
         });
@@ -79,15 +100,15 @@ module.exports = {
         database.deleteUser(req.params.id, (error, result) => {
             if (error) {
                 next({
-                    status: 400,
-                    result: error
+                    statusCode: 400,
+                    result: error,
                 });
             } else {
                 res.status(200).json({
-                    status: 200,
-                    result
+                    statusCode: 200,
+                    result,
                 });
             }
         });
-    }
-}
+    },
+};
