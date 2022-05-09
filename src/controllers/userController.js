@@ -1,12 +1,49 @@
-const database = require('../database/db');
-const Joi = require('joi');
+const database = require("../database/db");
+const Joi = require("joi");
 
 module.exports = {
+    validateUser: (req, res, next) => {
+        const user = req.body;
+
+        const schema = Joi.object({
+            password: Joi.string()
+                .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+                .required()
+                .messages({
+                    "string.base": "password should be a string",
+                    "any.required": "password is a required field",
+                    "string.pattern.base": "password must be a valid password",
+                }),
+            emailAddress: Joi.string()
+                .email({
+                    minDomainSegments: 2,
+                    tlds: { allow: ["com", "net", "eu", "nl"] },
+                })
+                .required()
+                .messages({
+                    "string.base": "emailAddress should be a string",
+                    "any.required": "emailAddress is a required field",
+                    "string.email": "emailAddress must be a valid email",
+                }),
+        }).unknown(true);
+
+        const { error } = schema.validate(user);
+
+        if (error) {
+            next({
+                statusCode: 400,
+                result: error.message,
+            });
+        } else {
+            next();
+        }
+    },
+
     listUsers: (req, res) => {
         database.listUsers((result) => {
             res.status(200).json({
                 statusCode: 200,
-                result
+                result,
             });
         });
     },
@@ -16,12 +53,12 @@ module.exports = {
             if (error) {
                 next({
                     statusCode: 400,
-                    error
+                    result: error,
                 });
             } else {
                 res.status(200).json({
                     statusCode: 200,
-                    result
+                    result,
                 });
             }
         });
@@ -29,8 +66,8 @@ module.exports = {
 
     getUserProfile: (req, res) => {
         next({
-            statusCode: 400,
-            error: 'Functionality has not been implemented yet.'
+            status: 400,
+            result: "Functionality has not been implemented yet.",
         });
     },
 
@@ -38,7 +75,7 @@ module.exports = {
         database.getUser(req.params.id, (result) => {
             res.status(200).json({
                 statusCode: 200,
-                result
+                result,
             });
         });
     },
@@ -48,12 +85,12 @@ module.exports = {
             if (error) {
                 next({
                     statusCode: 400,
-                    error
+                    result: error,
                 });
             } else {
                 res.status(200).json({
                     statusCode: 200,
-                    result
+                    result,
                 });
             }
         });
@@ -64,39 +101,14 @@ module.exports = {
             if (error) {
                 next({
                     statusCode: 400,
-                    error
+                    result: error,
                 });
             } else {
                 res.status(200).json({
                     statusCode: 200,
-                    result
+                    result,
                 });
             }
         });
     },
-
-    validateUser: (req, res, next) => {
-        const user = req.body;
-
-        const userSchema = Joi.object({
-            firstName: Joi.string(),
-            lastName: Joi.string(),
-            street: Joi.string(),
-            city: Joi.string(),
-            emailAddress: Joi.string()
-                .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'nl', 'eu'] } }),
-            password: Joi.string()
-                .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-        });
-
-        const { error } = userSchema.validate(user);
-        if (error) {
-            next({
-                status: 404,
-                error: error.details[0].message
-            });
-        } else {
-            next();
-        }
-    }
-}
+};
