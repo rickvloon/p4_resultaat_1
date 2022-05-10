@@ -198,7 +198,6 @@ module.exports = {
 
     updateUser: (req, res, next) => {
         DBConnection.getConnection((error, connection) => {
-            console.log("HEREEE1");
             if (error) {
                 next({
                     statusCode: 500,
@@ -217,13 +216,14 @@ module.exports = {
                 phoneNumber,
             } = req.body;
 
+            console.log(req.body);
+
             const isActive = req.body.isActive ? 1 : 0;
 
             connection.query(
                 'SELECT * FROM `user` WHERE id = ?;',
                 req.params.id,
                 (error, results, fields) => {
-                    console.log(results);
                     if (error) {
                         next({
                             statusCode: 500,
@@ -235,7 +235,6 @@ module.exports = {
                             result: 'User is not registered.',
                         });
                     } else {
-                        console.log("HEREEE");
                         connection.query(
                             'UPDATE `user` SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
                             [
