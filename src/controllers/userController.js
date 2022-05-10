@@ -162,6 +162,7 @@ module.exports = {
                 emailAddress,
                 (error, results, fields) => {
                     if (error) {
+                        console.log(error);
                         next({
                             statusCode: 500,
                             result: 'Internal server error.',
@@ -183,6 +184,7 @@ module.exports = {
                                 password,
                             ],
                             (error, results, fields) => {
+                                console.log(error);
                                 connection.release();
 
                                 if (error) {
@@ -338,7 +340,6 @@ module.exports = {
                     connection.release();
 
                     if (error) {
-                        console.log(error);
                         next({
                             statusCode: 500,
                             result: 'Internal servor error',
