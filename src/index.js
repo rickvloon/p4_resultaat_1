@@ -1,18 +1,18 @@
-const express = require("express");
-
-var usersRouter = require("./routes/users");
+const express = require('express');
+const usersRouter = require('./routes/users');
+require('dotenv').config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 app.use(express.json());
 
-app.use("/api/user", usersRouter);
+app.use('/api/user', usersRouter);
 
-app.use("*", (req, res) => {
+app.use('*', (req, res) => {
     res.status(401).json({
         status: 401,
-        result: "End-point not found",
+        result: 'End-point not found',
     });
 });
 

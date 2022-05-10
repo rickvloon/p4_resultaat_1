@@ -1,5 +1,5 @@
-const database = require("../database/db");
-const Joi = require("joi");
+const DBConnection = require('../../database/DBConnection');
+const Joi = require('joi');
 
 module.exports = {
     validateUser: (req, res, next) => {
@@ -7,23 +7,23 @@ module.exports = {
 
         const schema = Joi.object({
             password: Joi.string()
-                .pattern(new RegExp("^[a-zA-Z0-9]{3,30}$"))
+                .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
                 .required()
                 .messages({
-                    "string.base": "password should be a string",
-                    "any.required": "password is a required field",
-                    "string.pattern.base": "password must be a valid password",
+                    'string.base': 'password should be a string',
+                    'any.required': 'password is a required field',
+                    'string.pattern.base': 'password must be a valid password',
                 }),
             emailAddress: Joi.string()
                 .email({
                     minDomainSegments: 2,
-                    tlds: { allow: ["com", "net", "eu", "nl"] },
+                    tlds: { allow: ['com', 'net', 'eu', 'nl'] },
                 })
                 .required()
                 .messages({
-                    "string.base": "emailAddress should be a string",
-                    "any.required": "emailAddress is a required field",
-                    "string.email": "emailAddress must be a valid email",
+                    'string.base': 'emailAddress should be a string',
+                    'any.required': 'emailAddress is a required field',
+                    'string.email': 'emailAddress must be a valid email',
                 }),
         }).unknown(true);
 
@@ -39,12 +39,27 @@ module.exports = {
         }
     },
 
-    listUsers: (req, res) => {
-        database.listUsers((result) => {
-            res.status(200).json({
-                statusCode: 200,
-                result,
-            });
+    getAllUsers: (req, res) => {
+        DBConnection.getConnection((err, connection) => {
+            if (err) throw err; // not connected!
+
+            // Use the connection
+            connection.query(
+                'SELECT * FROM user;',
+                (error, results, fields) => {
+                    // When done with the connection, release it.
+                    connection.release();
+
+                    // Handle error after the release.
+                    if (error) throw error;
+
+                    console.log('#results = ', results.length);
+                    res.status(200).json({
+                        statusCode: 200,
+                        result: results,
+                    });
+                }
+            );
         });
     },
 
@@ -67,7 +82,7 @@ module.exports = {
     getUserProfile: (req, res) => {
         next({
             status: 400,
-            result: "Functionality has not been implemented yet.",
+            result: 'Functionality has not been implemented yet.',
         });
     },
 
