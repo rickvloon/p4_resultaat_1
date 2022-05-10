@@ -40,7 +40,7 @@ CREATE TABLE `meal` (
   `allergenes` set('gluten','lactose','noten') NOT NULL DEFAULT '',
   PRIMARY KEY (`id`),
   KEY `FK_e325266e1b4188f981a00677580` (`cookId`),
-  CONSTRAINT `FK_e325266e1b4188f981a00677580` FOREIGN KEY (`cookId`) REFERENCES `user` (`id`)
+  CONSTRAINT `FK_e325266e1b4188f981a00677580` FOREIGN KEY (`cookId`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ) ENGINE=InnoDB AUTO_INCREMENT=36 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -50,7 +50,7 @@ CREATE TABLE `meal` (
 
 LOCK TABLES `meal` WRITE;
 /*!40000 ALTER TABLE `meal` DISABLE KEYS */;
-INSERT INTO `meal` VALUES 
+INSERT INTO `meal` VALUES
 (1,1,0,0,1,'2022-03-22 17:35:00',4,12.75,'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',1,'2022-02-26 18:12:40.048998','2022-04-26 12:33:51.000000','Pasta Bolognese met tomaat, spekjes en kaas','Een heerlijke klassieker! Altijd goed voor tevreden gesmikkel!','gluten,lactose'),
 (2,1,1,0,0,'2022-05-22 13:35:00',4,12.75,'https://static.ah.nl/static/recepten/img_RAM_PRD159322_1024x748_JPG.jpg',2,'2022-02-26 18:12:40.048998','2022-04-25 12:56:05.000000','Aubergine uit de oven met feta, muntrijst en tomatensaus','Door aubergines in de oven te roosteren worden ze heerlijk zacht. De balsamico maakt ze heerlijk zoet.','noten'),
 (3,1,0,0,1,'2022-05-22 17:30:00',4,10.75,'https://static.ah.nl/static/recepten/img_099918_1024x748_JPG.jpg',2,'2022-02-26 18:12:40.048998','2022-03-15 14:10:19.000000','Spaghetti met tapenadekip uit de oven en frisse salade','Perfect voor doordeweeks, maar ook voor gasten tijdens een feestelijk avondje.','gluten,lactose'),
@@ -83,7 +83,7 @@ CREATE TABLE `meal_participants_user` (
 
 LOCK TABLES `meal_participants_user` WRITE;
 /*!40000 ALTER TABLE `meal_participants_user` DISABLE KEYS */;
-INSERT INTO `meal_participants_user` VALUES 
+INSERT INTO `meal_participants_user` VALUES
 (1,2),
 (1,3),
 (1,5),
@@ -124,7 +124,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES 
+INSERT INTO `user` VALUES
 (1,'Mariëtte','van den Dullemen',1,'m.vandullemen@server.nl','secret','','','',''),
 (2,'John','Doe',1,'j.doe@server.com','secret','06 12425475','editor,guest','',''),
 (3,'Herman','Huizinga',1,'h.huizinga@server.nl','secret','06-12345678','editor,guest','',''),
