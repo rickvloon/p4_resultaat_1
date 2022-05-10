@@ -2,55 +2,7 @@ const DBConnection = require('../../database/DBConnection');
 const Joi = require('joi');
 
 module.exports = {
-    validateNewUser: (req, res, next) => {
-        const user = req.body;
-
-        const schema = Joi.object({
-            firstName: Joi.string().required().messages({
-                'any.required': 'firstName is a required field',
-            }),
-            lastName: Joi.string().required().messages({
-                'any.required': 'lastName is a required field',
-            }),
-            street: Joi.string().required().messages({
-                'any.required': 'street is a required field',
-            }),
-            city: Joi.string().required().messages({
-                'any.required': 'city is a required field',
-            }),
-            password: Joi.string()
-                .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-                .required()
-                .messages({
-                    'string.base': 'password should be a string',
-                    'any.required': 'password is a required field',
-                    'string.pattern.base': 'password must be a valid password',
-                }),
-            emailAdress: Joi.string()
-                .email({
-                    minDomainSegments: 2,
-                    tlds: { allow: ['com', 'net', 'eu', 'nl'] },
-                })
-                .required()
-                .messages({
-                    'string.base': 'emailAdress should be a string',
-                    'any.required': 'emailAdress is a required field',
-                    'string.email': 'emailAdress must be a valid email',
-                }),
-        });
-
-        const { error } = schema.validate(user);
-        if (error) {
-            next({
-                statusCode: 400,
-                message: error.message
-            });
-        } else {
-            next();
-        }
-    },
-
-    validateUpdatedUser: (req, res, next) => {
+    validateUser: (req, res, next) => {
         const user = req.body;
 
         const schema = Joi.object({
