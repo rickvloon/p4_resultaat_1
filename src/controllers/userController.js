@@ -51,7 +51,7 @@ module.exports = {
         }
     },
 
-    getAllUsers: (req, res) => {
+    getAllUsers: (req, res, next) => {
         DBConnection.getConnection((err, connection) => {
             if (err) {
                 next({
