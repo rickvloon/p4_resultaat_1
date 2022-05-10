@@ -4,7 +4,7 @@ const Joi = require('joi');
 module.exports = {
     validateUser: (req, res, next) => {
         const user = req.body;
-
+        console.log(user);
         const schema = Joi.object({
             firstName: Joi.string().required().messages({
                 'any.required': 'firstName is a required field',
