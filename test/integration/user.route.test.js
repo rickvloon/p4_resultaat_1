@@ -7,36 +7,36 @@ chai.should();
 chai.use(chaiHttp);
 
 describe('Manage users /api/user', () => {
-    // describe('UC-201 add user /api/user', () => {
-    //     it('TC-201-1 should return a valid error when required input is missing', (done) => {
-    //         chai.request(server)
-    //             .post('/api/user')
-    //             .send({
-    //                 firstName: 'John',
-    //                 lastName: 'Doe',
-    //                 street: 'Lovensdijkstraat 61',
-    //                 city: 'Breda',
-    //                 password: 'secret',
-    //                 emailAdress: 'j.doe@server.com',
-    //             })
-    //             .end((err, res) => {
-    //                 assert.ifError(err);
-    //                 res.should.have.status(400);
-    //                 res.should.be.an('object');
+    describe('UC-201 add user /api/user', () => {
+        it('TC-201-1 should return a valid error when required input is missing', (done) => {
+            chai.request(server)
+                .post('/api/user')
+                .send({
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    password: 'secret',
+                    emailAdress: 'j.doe@server.com',
+                })
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(400);
+                    res.should.be.an('object');
 
-    //                 res.body.should.be
-    //                     .an('object')
-    //                     .that.has.all.keys('statusCode', 'result');
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'result');
 
-    //                 const { statusCode, result } = res.body;
-    //                 statusCode.should.be.an('number');
-    //                 result.should.be
-    //                     .an('string')
-    //                     .that.contains('emailAddress is a required field');
+                    const { statusCode, result } = res.body;
+                    statusCode.should.be.an('number');
+                    result.should.be
+                        .an('string')
+                        .that.contains('emailAddress is a required field');
 
-    //                 done();
-    //             });
-    //     });
+                    done();
+                });
+        });
 
         // it('TC-201-2 should return a valid error when email address is invalid', (done) => {
         //     chai.request(server)
@@ -125,7 +125,7 @@ describe('Manage users /api/user', () => {
         //             done();
         //         });
         // });
-    // });
+    });
 
     // describe('UC-202 Overview of users', () => {
     //     it('TC-202-1 should return an empty array when no users are registered', () => {
