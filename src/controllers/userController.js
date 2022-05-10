@@ -6,26 +6,18 @@ module.exports = {
         const user = req.body;
 
         const schema = Joi.object({
-            firstName: Joi.string()
-                .required()
-                .messages({
-                    'any.required': 'firstName is a required field',
-                }),
-            lastName: Joi.string()
-                .required()
-                .messages({
-                    'any.required': 'lastName is a required field',
-                }),
-            street: Joi.string()
-                .required()
-                .messages({
-                    'any.required': 'street is a required field',
-                }),
-            city: Joi.string()
-                .required()
-                .messages({
-                    'any.required': 'city is a required field',
-                }),
+            firstName: Joi.string().required().messages({
+                'any.required': 'firstName is a required field',
+            }),
+            lastName: Joi.string().required().messages({
+                'any.required': 'lastName is a required field',
+            }),
+            street: Joi.string().required().messages({
+                'any.required': 'street is a required field',
+            }),
+            city: Joi.string().required().messages({
+                'any.required': 'city is a required field',
+            }),
             password: Joi.string()
                 .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
                 .required()
@@ -61,19 +53,25 @@ module.exports = {
 
     getAllUsers: (req, res) => {
         DBConnection.getConnection((err, connection) => {
-            if (err) throw err; // not connected!
+            if (err) {
+                next({
+                    statusCode: 500,
+                    result: 'Internal servor error',
+                });
+            }
 
-            // Use the connection
             connection.query(
                 'SELECT * FROM user;',
                 (error, results, fields) => {
-                    // When done with the connection, release it.
                     connection.release();
 
-                    // Handle error after the release.
-                    if (error) throw error;
+                    if (error) {
+                        next({
+                            statusCode: 500,
+                            result: 'Internal servor error',
+                        });
+                    }
 
-                    console.log('#results = ', results.length);
                     res.status(200).json({
                         statusCode: 200,
                         result: results,
