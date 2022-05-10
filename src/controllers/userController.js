@@ -338,7 +338,7 @@ module.exports = {
                     connection.release();
 
                     if (error) {
-                        console.log('error');
+                        console.log(error);
                         next({
                             statusCode: 500,
                             result: 'Internal servor error',
