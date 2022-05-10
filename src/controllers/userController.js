@@ -233,8 +233,8 @@ module.exports = {
                             statusCode: 400,
                             result: 'User is not registered.',
                         });
-                        connection.release();
                     } else {
+                        console.log("HEREEE");
                         connection.query(
                             'UPDATE `user` SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
                             [
@@ -287,7 +287,6 @@ module.exports = {
                 req.params.id,
                 (error, results, fields) => {
                     connection.release();
-                    console.log(results);
                     if (error) {
                         next({
                             statusCode: 500,
