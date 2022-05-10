@@ -162,7 +162,6 @@ module.exports = {
                 emailAdress,
                 (error, results, fields) => {
                     if (error) {
-                        console.log(error);
                         next({
                             statusCode: 500,
                             result: 'Internal server error.',
@@ -184,7 +183,6 @@ module.exports = {
                                 password,
                             ],
                             (error, results, fields) => {
-                                console.log(error);
                                 connection.release();
 
                                 if (error) {
@@ -269,9 +267,10 @@ module.exports = {
                 city,
                 password,
                 emailAdress,
-                isActive,
                 phoneNumber,
             } = req.body;
+
+            const isActive = req.body.isActive ? 1 : 0;
 
             connection.query(
                 'SELECT * FROM `user` WHERE id = ?;',
@@ -289,7 +288,7 @@ module.exports = {
                         });
                     } else {
                         connection.query(
-                            'UPDATE `user` SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ? WHERE id = ?;',
+                            'UPDATE `user` SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ?, isActive = ?, phoneNumber = ?, WHERE id = ?;',
                             [
                                 firstName,
                                 lastName,
@@ -297,6 +296,8 @@ module.exports = {
                                 city,
                                 emailAdress,
                                 password,
+                                isActive,
+                                phoneNumber,
                                 req.params.id,
                             ],
                             (error, results, fields) => {
