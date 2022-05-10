@@ -222,6 +222,7 @@ module.exports = {
                 'SELECT * FROM `user` WHERE id = ?;',
                 req.params.id,
                 (error, results, fields) => {
+                    console.log(results);
                     if (error) {
                         next({
                             statusCode: 500,
@@ -285,7 +286,7 @@ module.exports = {
                 req.params.id,
                 (error, results, fields) => {
                     connection.release();
-
+                    console.log(results);
                     if (error) {
                         next({
                             statusCode: 500,
