@@ -148,14 +148,8 @@ module.exports = {
                 return;
             }
 
-            const {
-                firstName,
-                lastName,
-                street,
-                city,
-                password,
-                emailAdress,
-            } = req.body;
+            const { firstName, lastName, street, city, password, emailAdress } =
+                req.body;
 
             connection.query(
                 'SELECT * FROM `user` WHERE emailAdress = ?;',
@@ -251,8 +245,8 @@ module.exports = {
     },
 
     updateUser: (req, res, next) => {
-        DBConnection.getConnection((err, connection) => {
-            if (err) {
+        DBConnection.getConnection((error, connection) => {
+            if (error) {
                 next({
                     statusCode: 500,
                     result: 'Internal servor error',
@@ -288,7 +282,7 @@ module.exports = {
                         });
                     } else {
                         connection.query(
-                            'UPDATE `user` SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ?, isActive = ?, phoneNumber = ?, WHERE id = ?;',
+                            'UPDATE `user` SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
                             [
                                 firstName,
                                 lastName,
