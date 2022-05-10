@@ -96,32 +96,5 @@ describe('Manage users /api/user', () => {
                     done();
                 });
         });
-
-        it('TC-201-5 should return a valid status and response with user after registering the user', (done) => {
-            chai.request(server)
-                .post('/api/user')
-                .send({
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    emailAddress: 'john@gmail.com',
-                    password: '12345',
-                })
-                .end((err, res) => {
-                    res.should.have.status(200);
-                    res.should.be.an('object');
-
-                    res.body.should.be
-                        .an('object')
-                        .that.has.keys('statusCode', 'result');
-
-                    const { result } = res.body;
-
-                    result.should.be
-                        .an('object')
-                        .that.has.all.keys('firstName', 'lastName', 'password', 'id', 'emailAddress')
-
-                    done();
-                });
-        });
     });
 });
