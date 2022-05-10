@@ -4,7 +4,7 @@ const Joi = require('joi');
 module.exports = {
     validateUser: (req, res, next) => {
         const user = req.body;
-        console.log(user);
+
         const schema = Joi.object({
             firstName: Joi.string().required().messages({
                 'any.required': 'firstName is a required field',
@@ -76,7 +76,7 @@ module.exports = {
                     if (error) {
                         next({
                             statusCode: 500,
-                            result: 'Internal servor error',
+                            message: 'Internal servor error',
                         });
                     }
 
@@ -109,7 +109,7 @@ module.exports = {
                     if (error) {
                         next({
                             statusCode: 500,
-                            result: 'Internal server error.',
+                            message: 'Internal server error.',
                         });
                     } else if (results.length > 0) {
                         next({
@@ -160,12 +160,11 @@ module.exports = {
     },
 
     getUser: (req, res, next) => {
-        console.log('sup');
         DBConnection.getConnection((err, connection) => {
             if (err) {
                 next({
                     statusCode: 500,
-                    result: 'Internal servor error',
+                    message: 'Internal server error',
                 });
                 return;
             }
@@ -179,7 +178,7 @@ module.exports = {
                     if (error) {
                         next({
                             statusCode: 500,
-                            result: 'Internal servor error',
+                            message: 'Internal servor error',
                         });
                     } else if (!results.length > 0) {
                         next({
@@ -202,7 +201,7 @@ module.exports = {
             if (error) {
                 next({
                     statusCode: 500,
-                    result: 'Internal servor error',
+                    message: 'Internal servor error',
                 });
                 return;
             }
@@ -217,8 +216,6 @@ module.exports = {
                 phoneNumber,
             } = req.body;
 
-            console.log(req.body);
-
             const isActive = req.body.isActive ? 1 : 0;
 
             connection.query(
@@ -228,7 +225,7 @@ module.exports = {
                     if (error) {
                         next({
                             statusCode: 500,
-                            result: 'Internal server error.',
+                            message: 'Internal server error.',
                         });
                     } else if (!results.length > 0) {
                         next({
@@ -237,33 +234,52 @@ module.exports = {
                         });
                     } else {
                         connection.query(
-                            'UPDATE `user` SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
-                            [
-                                firstName,
-                                lastName,
-                                street,
-                                city,
-                                emailAdress,
-                                password,
-                                isActive,
-                                phoneNumber,
-                                req.params.id,
-                            ],
+                            'SELECT count(emailAdress) as count from user WHERE emailAdress = ? AND id <> ?',
+                            [emailAdress, req.params.id],
                             (error, results, fields) => {
-                                connection.release();
-
                                 if (error) {
+                                    console.log(error);
                                     next({
                                         statusCode: 500,
-                                        result: 'Internal servor error',
+                                        message: 'Internal server error',
+                                    });
+                                } else if (results[0].count >= 1) {
+                                    next({
+                                        statusCode: 400,
+                                        message: 'Email is already registered',
                                     });
                                 } else {
-                                    res.status(200).json({
-                                        statusCode: 200,
-                                        result: {
-                                            username: `${firstName} ${lastName}`,
-                                        },
-                                    });
+                                    connection.query(
+                                        'UPDATE `user` SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
+                                        [
+                                            firstName,
+                                            lastName,
+                                            street,
+                                            city,
+                                            emailAdress,
+                                            password,
+                                            isActive,
+                                            phoneNumber,
+                                            req.params.id,
+                                        ],
+                                        (error, results, fields) => {
+                                            connection.release();
+
+                                            if (error) {
+                                                next({
+                                                    statusCode: 500,
+                                                    result: 'Internal servor error',
+                                                });
+                                            } else {
+                                                res.status(200).json({
+                                                    statusCode: 200,
+                                                    result: {
+                                                        username: `${firstName} ${lastName}`,
+                                                    },
+                                                });
+                                            }
+                                        }
+                                    );
                                 }
                             }
                         );
@@ -301,7 +317,7 @@ module.exports = {
                     } else {
                         res.status(200).json({
                             statusCode: 200,
-                            message: 'User deleted'
+                            message: 'User deleted',
                         });
                     }
                 }
