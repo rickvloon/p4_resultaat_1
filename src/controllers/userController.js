@@ -198,6 +198,7 @@ module.exports = {
 
     updateUser: (req, res, next) => {
         DBConnection.getConnection((error, connection) => {
+            console.log("HEREEE1");
             if (error) {
                 next({
                     statusCode: 500,
