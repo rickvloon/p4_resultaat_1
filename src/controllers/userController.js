@@ -213,7 +213,7 @@ module.exports = {
         });
     },
 
-    getUser: (req, res) => {
+    getUser: (req, res, next) => {
         DBConnection.getConnection((err, connection) => {
             if (err) {
                 next({
