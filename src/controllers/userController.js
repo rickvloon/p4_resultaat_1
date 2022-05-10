@@ -179,11 +179,12 @@ module.exports = {
                             statusCode: 500,
                             result: 'Internal servor error',
                         });
+                    } else if (!results.length > 0) {
+                        next({
+                            statusCode: 404,
+                            message: 'User is not registered.',
+                        });
                     } else {
-                        if (!results.length > 0) {
-                            results = {};
-                        }
-
                         res.status(200).json({
                             statusCode: 200,
                             result: results[0],
