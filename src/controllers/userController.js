@@ -160,6 +160,7 @@ module.exports = {
     },
 
     getUser: (req, res, next) => {
+        console.log('sup');
         DBConnection.getConnection((err, connection) => {
             if (err) {
                 next({
