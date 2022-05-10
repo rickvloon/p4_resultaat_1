@@ -163,7 +163,7 @@ module.exports = {
                         });
                     } else if (results.length > 0) {
                         next({
-                            statusCode: 400,
+                            statusCode: 409,
                             result: 'User is already registered.',
                         });
                     } else {
