@@ -51,7 +51,7 @@ module.exports = {
         if (error) {
             next({
                 statusCode: 400,
-                message: error.message
+                message: error.message,
             });
         } else {
             next();
@@ -139,7 +139,8 @@ module.exports = {
                                     res.status(201).json({
                                         statusCode: 201,
                                         result: {
-                                            username: `${firstName} ${lastName}`,
+                                            id: results.insertId,
+                                            ...req.body,
                                         },
                                     });
                                 }
@@ -159,7 +160,6 @@ module.exports = {
     },
 
     getUser: (req, res, next) => {
-        console.log(req.params.id);
         DBConnection.getConnection((err, connection) => {
             if (err) {
                 next({
