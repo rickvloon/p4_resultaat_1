@@ -114,7 +114,7 @@ module.exports = {
                     } else if (results.length > 0) {
                         next({
                             statusCode: 409,
-                            result: 'User is already registered.',
+                            message: 'User is already registered.',
                         });
                     } else {
                         connection.query(
@@ -136,7 +136,7 @@ module.exports = {
                                         result: 'Internal servor error',
                                     });
                                 } else {
-                                    res.status(200).json({
+                                    res.status(201).json({
                                         statusCode: 201,
                                         result: {
                                             username: `${firstName} ${lastName}`,
