@@ -21,7 +21,10 @@ describe('Manage users /api/user', () => {
                 .send({
                     firstName: 'John',
                     lastName: 'Doe',
-                    password: '123',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    password: 'secret',
+                    emailAdress: 'j.doe@server.com',
                 })
                 .end((err, res) => {
                     assert.ifError(err);
@@ -118,7 +121,13 @@ describe('Manage users /api/user', () => {
 
                     result.should.be
                         .an('object')
-                        .that.has.all.keys('firstName', 'lastName', 'password', 'id', 'emailAddress')
+                        .that.has.all.keys(
+                            'firstName',
+                            'lastName',
+                            'password',
+                            'id',
+                            'emailAddress'
+                        );
 
                     done();
                 });
