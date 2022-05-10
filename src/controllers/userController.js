@@ -44,7 +44,9 @@ module.exports = {
         if (error) {
             next({
                 statusCode: 400,
-                result: error.message,
+                result: {
+                    message: error.message,
+                },
             });
         } else {
             next();
@@ -100,7 +102,9 @@ module.exports = {
         if (error) {
             next({
                 statusCode: 400,
-                result: error.message,
+                result: {
+                    message: error.message
+                },
             });
         } else {
             next();
@@ -162,7 +166,7 @@ module.exports = {
                         });
                     } else if (results.length > 0) {
                         next({
-                            statusCode: 409,
+                            statusCode: 400,
                             result: 'User is already registered.',
                         });
                     } else {
