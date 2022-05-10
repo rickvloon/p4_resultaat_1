@@ -292,8 +292,8 @@ module.exports = {
                         });
                     } else if (!results.affectedRows > 0) {
                         next({
-                            statusCode: 404,
-                            result: 'User is not registered.',
+                            statusCode: 400,
+                            message: 'User is not registered.',
                         });
                     } else {
                         res.status(200).json({
