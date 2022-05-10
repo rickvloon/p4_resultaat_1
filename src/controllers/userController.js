@@ -33,9 +33,9 @@ module.exports = {
                 })
                 .required()
                 .messages({
-                    'string.base': 'emailAddress should be a string',
-                    'any.required': 'emailAddress is a required field',
-                    'string.email': 'emailAddress must be a valid email',
+                    'string.base': 'emailAdress should be a string',
+                    'any.required': 'emailAdress is a required field',
+                    'string.email': 'emailAdress must be a valid email',
                 }),
         });
 
@@ -89,9 +89,9 @@ module.exports = {
                 })
                 .required()
                 .messages({
-                    'string.base': 'emailAddress should be a string',
-                    'any.required': 'emailAddress is a required field',
-                    'string.email': 'emailAddress must be a valid email',
+                    'string.base': 'emailAdress should be a string',
+                    'any.required': 'emailAdress is a required field',
+                    'string.email': 'emailAdress must be a valid email',
                 }),
         });
 
@@ -154,14 +154,15 @@ module.exports = {
                 street,
                 city,
                 password,
-                emailAddress,
+                emailAdress,
             } = req.body;
 
             connection.query(
                 'SELECT * FROM `user` WHERE emailAdress = ?;',
-                emailAddress,
+                emailAdress,
                 (error, results, fields) => {
                     if (error) {
+                        console.log(error);
                         next({
                             statusCode: 500,
                             result: 'Internal server error.',
@@ -183,6 +184,7 @@ module.exports = {
                                 password,
                             ],
                             (error, results, fields) => {
+                                console.log(error);
                                 connection.release();
 
                                 if (error) {
@@ -213,7 +215,7 @@ module.exports = {
         });
     },
 
-    getUser: (req, res) => {
+    getUser: (req, res, next) => {
         DBConnection.getConnection((err, connection) => {
             if (err) {
                 next({
@@ -266,7 +268,7 @@ module.exports = {
                 street,
                 city,
                 password,
-                emailAddress,
+                emailAddres,
                 isActive,
                 phoneNumber,
             } = req.body;
@@ -293,7 +295,7 @@ module.exports = {
                                 lastName,
                                 street,
                                 city,
-                                emailAddress,
+                                emailAddres,
                                 password,
                                 req.params.id,
                             ],
