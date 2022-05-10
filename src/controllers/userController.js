@@ -40,13 +40,10 @@ module.exports = {
         });
 
         const { error } = schema.validate(user);
-
         if (error) {
             next({
                 statusCode: 400,
-                result: {
-                    message: error.message,
-                },
+                message: error.message
             });
         } else {
             next();
