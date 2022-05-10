@@ -1,19 +1,38 @@
 name: Deploy to Heroku
 
 on:
-  push:
-    branches:
-      - master
+    push:
+        branches:
+            - master
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    environment:
-      name: Heroku
-    steps:
-      - uses: actions/checkout@v2
-      - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
-        with:
-          heroku_email: "mail@rickvanloon.nl"
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: "rickvanloon-p4"
+    integrationtests:
+        runs-on: ubuntu-latest
+        steps:
+            # Checkout the Repo
+            - uses: actions/checkout@v2
+
+            # Install Node 16
+            - name: Setup Node
+              uses: actions/setup-node@v1
+              with:
+                  node-version: 16
+
+            # Install dependencies
+            - run: npm install
+
+            # Run tests
+            - run: npm test
+
+    deploy:
+        needs: integrationtests
+        runs-on: ubuntu-latest
+        environment:
+            name: Heroku # naam van mijn environment op GitHub
+        steps:
+            - uses: actions/checkout@v2
+            - uses: akhileshns/heroku-deploy@v3.12.12
+              with:
+                  heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+                  heroku_app_name: rickvanloon-p4
+                  heroku_email: mail@rickvanloon.nl
