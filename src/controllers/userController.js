@@ -159,6 +159,7 @@ module.exports = {
     },
 
     getUser: (req, res, next) => {
+        console.log(req.params.id);
         DBConnection.getConnection((err, connection) => {
             if (err) {
                 next({
