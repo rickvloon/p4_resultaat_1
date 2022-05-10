@@ -180,7 +180,7 @@ module.exports = {
                                 lastName,
                                 street,
                                 city,
-                                emailAddress,
+                                emailAdress,
                                 password,
                             ],
                             (error, results, fields) => {
@@ -268,7 +268,7 @@ module.exports = {
                 street,
                 city,
                 password,
-                emailAddres,
+                emailAdress,
                 isActive,
                 phoneNumber,
             } = req.body;
@@ -295,7 +295,7 @@ module.exports = {
                                 lastName,
                                 street,
                                 city,
-                                emailAddres,
+                                emailAdress,
                                 password,
                                 req.params.id,
                             ],
