@@ -152,10 +152,10 @@ module.exports = {
         });
     },
 
-    getUserProfile: (req, res) => {
+    getUserProfile: (req, res, next) => {
         next({
-            status: 400,
-            result: 'Functionality has not been implemented yet.',
+            statusCode: 401,
+            message: 'Functionality has not been implemented yet',
         });
     },
 
@@ -238,7 +238,6 @@ module.exports = {
                             [emailAdress, req.params.id],
                             (error, results, fields) => {
                                 if (error) {
-                                    console.log(error);
                                     next({
                                         statusCode: 500,
                                         message: 'Internal server error',
