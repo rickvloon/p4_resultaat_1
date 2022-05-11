@@ -452,7 +452,6 @@ describe('Manage users /api/user', () => {
                 })
                 .end((err, res) => {
                     assert.ifError(err);
-                    console.log(res.body);
                     res.should.have.status(400);
                     res.should.be.an('object');
 
@@ -470,15 +469,15 @@ describe('Manage users /api/user', () => {
                 });
         });
 
-        it('TC-201-2 should return a valid error when email address is invalid', (done) => {
+        it('TC-205-4 should return a valid statuscode and error message when user does not exist', (done) => {
             chai.request(server)
-                .post('/api/user')
+                .put('/api/user/999999999')
                 .send({
                     firstName: 'John',
                     lastName: 'Doe',
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
-                    emailAdress: 'invalidemail',
+                    emailAdress: 'test@gmail.com',
                     password: 'secret',
                     isActive: true,
                     phoneNumber: '12345678',
@@ -496,98 +495,36 @@ describe('Manage users /api/user', () => {
                     statusCode.should.be.an('number');
                     message.should.be
                         .an('string')
-                        .that.contains('emailAdress must be a valid email');
+                        .that.contains('User is not registered.');
 
                     done();
                 });
         });
 
-        it('TC-201-3 should return a valid error when password is invalid', (done) => {
+        it('TC-205-6 should return a valid statusCode and user when succesfully registered', (done) => {
             chai.request(server)
-                .post('/api/user')
+                .put('/api/user/1')
                 .send({
                     firstName: 'John',
                     lastName: 'Doe',
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
-                    emailAdress: 'invalidemail',
-                    password: '&*%_$@',
+                    emailAdress: 'update@gmail.com',
+                    password: 'secret',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
                 .end((err, res) => {
                     assert.ifError(err);
-                    res.should.have.status(400);
+                    res.should.have.status(200);
                     res.should.be.an('object');
 
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('statusCode', 'message');
+                        .that.has.all.keys('statusCode', 'result');
 
-                    const { statusCode, message } = res.body;
+                    const { statusCode, result } = res.body;
                     statusCode.should.be.an('number');
-                    message.should.be
-                        .an('string')
-                        .that.contains('password must be a valid password');
-
-                    done();
-                });
-        });
-
-        it('TC-201-4 should return a valid status and message when a user is already registered', (done) => {
-            chai.request(server)
-                .post('/api/user')
-                .send({
-                    firstName: 'Server',
-                    lastName: 'server',
-                    street: 'Lovensdijkstraat 61',
-                    city: 'Breda',
-                    emailAdress: 'name@server.nl',
-                    password: '123',
-                    isActive: true,
-                    phoneNumber: '12345678',
-                })
-                .end((err, res) => {
-                    res.should.have.status(409);
-                    res.should.be.an('object');
-
-                    res.body.should.be
-                        .an('object')
-                        .that.has.keys('statusCode', 'message');
-
-                    const { statusCode, message } = res.body;
-
-                    statusCode.should.be.an('number');
-                    message.should.be
-                        .an('string')
-                        .that.contains('User is already registered');
-
-                    done();
-                });
-        });
-
-        it('TC-201-5 should return a valid status and response with user after registering the user', (done) => {
-            chai.request(server)
-                .post('/api/user')
-                .send({
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    street: 'Lovensdijkstraat 61',
-                    city: 'Breda',
-                    emailAdress: 'rick@gmail.com',
-                    password: '123',
-                    isActive: true,
-                    phoneNumber: '12345678',
-                })
-                .end((err, res) => {
-                    res.should.have.status(201);
-                    res.should.be.an('object');
-
-                    res.body.should.be
-                        .an('object')
-                        .that.has.keys('statusCode', 'result');
-
-                    const { result } = res.body;
 
                     result.should.be
                         .an('object')

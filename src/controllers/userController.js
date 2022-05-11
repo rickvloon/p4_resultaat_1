@@ -273,7 +273,8 @@ module.exports = {
                                                 res.status(200).json({
                                                     statusCode: 200,
                                                     result: {
-                                                        username: `${firstName} ${lastName}`,
+                                                        id: req.params.id,
+                                                        ...req.body
                                                     },
                                                 });
                                             }
