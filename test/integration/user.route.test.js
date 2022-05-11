@@ -579,7 +579,7 @@ describe('Manage users /api/user', () => {
                     statusCode.should.be.an('number');
                     message.should.be
                         .an('string')
-                        .that.contains('User is not registered');
+                        .that.contains('User does not exist');
 
                     done();
                 });
