@@ -337,7 +337,9 @@ describe('Manage users /api/user', () => {
                     statusCode.should.be.an('number');
                     message.should.be
                         .an('string')
-                        .that.contains('Functionality has not been implemented yet');
+                        .that.contains(
+                            'Functionality has not been implemented yet'
+                        );
 
                     done();
                 });
@@ -345,6 +347,23 @@ describe('Manage users /api/user', () => {
     });
 
     describe('UC-204 request user details /api/user/:id', () => {
+        beforeEach((done) => {
+            DBConnection.getConnection(function (err, connection) {
+                if (err) throw err;
+
+                connection.query(
+                    CLEAR_DB + INSERT_USER,
+                    function (error, results, fields) {
+                        connection.release();
+
+                        if (error) throw error;
+
+                        done();
+                    }
+                );
+            });
+        });
+
         it('TC-204-2 should return a valid statusCode with error message since when user does not exist', (done) => {
             chai.request(server)
                 .get('/api/user/9999999')
@@ -362,6 +381,39 @@ describe('Manage users /api/user', () => {
                     message.should.be
                         .an('string')
                         .that.contains('User is not registered.');
+
+                    done();
+                });
+        });
+
+        it('TC-204-3 should return a valid statusCode with user when user is registered', (done) => {
+            chai.request(server)
+                .get('/api/user/1')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'result');
+
+                    const { statusCode, result } = res.body;
+
+                    statusCode.should.be.an('number');
+                    result.should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'firstName',
+                            'lastName',
+                            'password',
+                            'street',
+                            'city',
+                            'id',
+                            'emailAdress',
+                            'isActive',
+                            'roles',
+                            'phoneNumber'
+                        );
 
                     done();
                 });
