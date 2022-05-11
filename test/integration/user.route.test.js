@@ -579,7 +579,29 @@ describe('Manage users /api/user', () => {
                     statusCode.should.be.an('number');
                     message.should.be
                         .an('string')
-                        .that.contains('User is not registered.');
+                        .that.contains('User is not registered');
+
+                    done();
+                });
+        });
+
+        it('TC-206-4 should return a valid statusCode with succes message when user is deleted', (done) => {
+            chai.request(server)
+                .delete('/api/user/1')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('User deleted');
 
                     done();
                 });
