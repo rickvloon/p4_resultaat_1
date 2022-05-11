@@ -53,6 +53,8 @@ describe('Manage users /api/user', () => {
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
                     password: 'secret',
+                    isActive: true,
+                    phoneNumber: '12345678'
                 })
                 .end((err, res) => {
                     assert.ifError(err);
@@ -67,7 +69,7 @@ describe('Manage users /api/user', () => {
                     statusCode.should.be.an('number');
                     message.should.be
                         .an('string')
-                        .that.contains('emailAddress is a required field');
+                        .that.contains('emailAdress is a required field');
 
                     done();
                 });

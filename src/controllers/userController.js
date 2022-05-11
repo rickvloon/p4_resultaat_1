@@ -63,7 +63,7 @@ module.exports = {
             if (err) {
                 next({
                     statusCode: 500,
-                    result: 'Internal servor error',
+                    message: 'Internal servor error',
                 });
                 return;
             }
@@ -94,7 +94,7 @@ module.exports = {
             if (err) {
                 next({
                     statusCode: 500,
-                    result: 'Internal servor error',
+                    message: 'Internal servor error',
                 });
                 return;
             }
@@ -133,7 +133,7 @@ module.exports = {
                                 if (error) {
                                     next({
                                         statusCode: 500,
-                                        result: 'Internal servor error',
+                                        message: 'Internal servor error',
                                     });
                                 } else {
                                     res.status(201).json({
@@ -230,7 +230,7 @@ module.exports = {
                     } else if (!results.length > 0) {
                         next({
                             statusCode: 400,
-                            result: 'User is not registered.',
+                            message: 'User is not registered.',
                         });
                     } else {
                         connection.query(
