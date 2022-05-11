@@ -584,7 +584,6 @@ describe('Manage users /api/user', () => {
                     done();
                 });
         });
-
         it('TC-206-4 should return a valid statusCode with succes message when user is deleted', (done) => {
             chai.request(server)
                 .delete('/api/user/1')
