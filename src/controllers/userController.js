@@ -63,7 +63,7 @@ module.exports = {
             if (err) {
                 next({
                     statusCode: 500,
-                    result: 'Internal servor error',
+                    message: 'Internal servor error',
                 });
                 return;
             }
@@ -94,7 +94,7 @@ module.exports = {
             if (err) {
                 next({
                     statusCode: 500,
-                    result: 'Internal servor error',
+                    message: 'Internal servor error',
                 });
                 return;
             }
@@ -133,7 +133,7 @@ module.exports = {
                                 if (error) {
                                     next({
                                         statusCode: 500,
-                                        result: 'Internal servor error',
+                                        message: 'Internal servor error',
                                     });
                                 } else {
                                     res.status(201).json({
@@ -152,10 +152,10 @@ module.exports = {
         });
     },
 
-    getUserProfile: (req, res) => {
+    getUserProfile: (req, res, next) => {
         next({
-            status: 400,
-            result: 'Functionality has not been implemented yet.',
+            statusCode: 401,
+            message: 'Functionality has not been implemented yet',
         });
     },
 
@@ -230,7 +230,7 @@ module.exports = {
                     } else if (!results.length > 0) {
                         next({
                             statusCode: 400,
-                            result: 'User is not registered.',
+                            message: 'User is not registered.',
                         });
                     } else {
                         connection.query(
@@ -238,7 +238,6 @@ module.exports = {
                             [emailAdress, req.params.id],
                             (error, results, fields) => {
                                 if (error) {
-                                    console.log(error);
                                     next({
                                         statusCode: 500,
                                         message: 'Internal server error',
@@ -274,7 +273,8 @@ module.exports = {
                                                 res.status(200).json({
                                                     statusCode: 200,
                                                     result: {
-                                                        username: `${firstName} ${lastName}`,
+                                                        id: req.params.id,
+                                                        ...req.body
                                                     },
                                                 });
                                             }
@@ -312,7 +312,7 @@ module.exports = {
                     } else if (!results.affectedRows > 0) {
                         next({
                             statusCode: 400,
-                            message: 'User does not exist',
+                            message: 'User is not registered',
                         });
                     } else {
                         res.status(200).json({
