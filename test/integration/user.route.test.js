@@ -18,7 +18,8 @@ const CLEAR_DB =
 
 const INSERT_USER =
     'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
-    '(1, "first", "last", "name@server.nl", "secret", "street", "city");';
+    '(1, "first", "last", "name@server.nl", "secret", "street", "city"),' +
+    '(2, "first", "last", "second@server.nl", "secret", "street", "city");';
 
 const INSERT_MEALS =
     'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
@@ -143,17 +144,17 @@ describe('Manage users /api/user', () => {
             chai.request(server)
                 .post('/api/user')
                 .send({
-                    firstName: 'John',
-                    lastName: 'Doe',
+                    firstName: 'Server',
+                    lastName: 'server',
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
-                    emailAdress: 'rick@gmail.com',
+                    emailAdress: 'name@server.nl',
                     password: '123',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
                 .end((err, res) => {
-                    res.should.have.status(201);
+                    res.should.have.status(409);
                     res.should.be.an('object');
 
                     res.body.should.be
@@ -214,7 +215,24 @@ describe('Manage users /api/user', () => {
     });
 
     describe('UC-202 Overview of users', () => {
-        it('TC-202-1 should return an empty array when no users are registered', () => {
+        beforeEach((done) => {
+            DBConnection.getConnection(function (err, connection) {
+                if (err) throw err;
+
+                connection.query(
+                    CLEAR_DB,
+                    function (error, results, fields) {
+                        connection.release();
+
+                        if (error) throw error;
+
+                        done();
+                    }
+                );
+            });
+        });
+
+        it.only('TC-202-1 should return an empty array when no users are registered', () => {
             chai.request(server)
                 .get('/api/user')
                 .end((err, res) => {
