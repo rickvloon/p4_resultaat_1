@@ -364,7 +364,7 @@ describe('Manage users /api/user', () => {
             });
         });
 
-        it('TC-204-2 should return a valid statusCode with error message since when user does not exist', (done) => {
+        it('TC-204-2 should return a valid statusCode with error message when user does not exist', (done) => {
             chai.request(server)
                 .get('/api/user/9999999')
                 .end((err, res) => {
@@ -539,6 +539,47 @@ describe('Manage users /api/user', () => {
                             'isActive',
                             'phoneNumber'
                         );
+
+                    done();
+                });
+        });
+    });
+
+    describe('UC-206 delete user /api/user', () => {
+        beforeEach((done) => {
+            DBConnection.getConnection(function (err, connection) {
+                if (err) throw err;
+
+                connection.query(
+                    CLEAR_DB + INSERT_USER,
+                    function (error, results, fields) {
+                        connection.release();
+
+                        if (error) throw error;
+
+                        done();
+                    }
+                );
+            });
+        });
+
+        it('TC-206-1 should return a valid statusCode with error message when user does not exist', (done) => {
+            chai.request(server)
+                .delete('/api/user/999999')
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('User is not registered.');
 
                     done();
                 });
