@@ -139,17 +139,53 @@ describe('Manage users /api/user', () => {
                 });
         });
 
+        it('TC-201-4 should return a valid status and message when a user is already registered', (done) => {
+            chai.request(server)
+                .post('/api/user')
+                .send({
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    emailAdress: 'rick@gmail.com',
+                    password: '123',
+                    isActive: true,
+                    phoneNumber: '12345678',
+                })
+                .end((err, res) => {
+                    res.should.have.status(201);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('User is already registered');
+
+                    done();
+                });
+        });
+
         it('TC-201-5 should return a valid status and response with user after registering the user', (done) => {
             chai.request(server)
                 .post('/api/user')
                 .send({
                     firstName: 'John',
                     lastName: 'Doe',
-                    emailAddress: 'john@gmail.com',
-                    password: '12345',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    emailAdress: 'rick@gmail.com',
+                    password: '123',
+                    isActive: true,
+                    phoneNumber: '12345678',
                 })
                 .end((err, res) => {
-                    res.should.have.status(200);
+                    res.should.have.status(201);
                     res.should.be.an('object');
 
                     res.body.should.be
@@ -164,8 +200,12 @@ describe('Manage users /api/user', () => {
                             'firstName',
                             'lastName',
                             'password',
+                            'street',
+                            'city',
                             'id',
-                            'emailAddress'
+                            'emailAdress',
+                            'isActive',
+                            'phoneNumber'
                         );
 
                     done();
