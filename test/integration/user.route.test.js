@@ -54,7 +54,7 @@ describe('Manage users /api/user', () => {
                     city: 'Breda',
                     password: 'secret',
                     isActive: true,
-                    phoneNumber: '12345678'
+                    phoneNumber: '12345678',
                 })
                 .end((err, res) => {
                     assert.ifError(err);
@@ -81,8 +81,12 @@ describe('Manage users /api/user', () => {
                 .send({
                     firstName: 'John',
                     lastName: 'Doe',
-                    emailAddress: 'invalidemail',
-                    password: '123',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    emailAdress: 'invalidemail',
+                    password: 'secret',
+                    isActive: true,
+                    phoneNumber: '12345678',
                 })
                 .end((err, res) => {
                     assert.ifError(err);
@@ -91,13 +95,13 @@ describe('Manage users /api/user', () => {
 
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('statusCode', 'result');
+                        .that.has.all.keys('statusCode', 'message');
 
-                    const { statusCode, result } = res.body;
+                    const { statusCode, message } = res.body;
                     statusCode.should.be.an('number');
-                    result.should.be
+                    message.should.be
                         .an('string')
-                        .that.contains('emailAddress must be a valid email');
+                        .that.contains('emailAdress must be a valid email');
 
                     done();
                 });
