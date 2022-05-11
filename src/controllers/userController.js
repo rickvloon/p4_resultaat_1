@@ -2,56 +2,7 @@ const DBConnection = require('../../database/DBConnection');
 const Joi = require('joi');
 
 module.exports = {
-    validateNewUser: (req, res, next) => {
-        const user = req.body;
-
-        const schema = Joi.object({
-            firstName: Joi.string().required().messages({
-                'any.required': 'firstName is a required field',
-            }),
-            lastName: Joi.string().required().messages({
-                'any.required': 'lastName is a required field',
-            }),
-            street: Joi.string().required().messages({
-                'any.required': 'street is a required field',
-            }),
-            city: Joi.string().required().messages({
-                'any.required': 'city is a required field',
-            }),
-            password: Joi.string()
-                .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
-                .required()
-                .messages({
-                    'string.base': 'password should be a string',
-                    'any.required': 'password is a required field',
-                    'string.pattern.base': 'password must be a valid password',
-                }),
-            emailAdress: Joi.string()
-                .email({
-                    minDomainSegments: 2,
-                    tlds: { allow: ['com', 'net', 'eu', 'nl'] },
-                })
-                .required()
-                .messages({
-                    'string.base': 'emailAdress should be a string',
-                    'any.required': 'emailAdress is a required field',
-                    'string.email': 'emailAdress must be a valid email',
-                }),
-        });
-
-        const { error } = schema.validate(user);
-
-        if (error) {
-            next({
-                statusCode: 400,
-                result: error.message,
-            });
-        } else {
-            next();
-        }
-    },
-
-    validateUpdatedUser: (req, res, next) => {
+    validateUser: (req, res, next) => {
         const user = req.body;
 
         const schema = Joi.object({
@@ -100,7 +51,7 @@ module.exports = {
         if (error) {
             next({
                 statusCode: 400,
-                result: error.message,
+                message: error.message,
             });
         } else {
             next();
@@ -125,7 +76,7 @@ module.exports = {
                     if (error) {
                         next({
                             statusCode: 500,
-                            result: 'Internal servor error',
+                            message: 'Internal servor error',
                         });
                     }
 
@@ -148,29 +99,22 @@ module.exports = {
                 return;
             }
 
-            const {
-                firstName,
-                lastName,
-                street,
-                city,
-                password,
-                emailAdress,
-            } = req.body;
+            const { firstName, lastName, street, city, password, emailAdress } =
+                req.body;
 
             connection.query(
                 'SELECT * FROM `user` WHERE emailAdress = ?;',
                 emailAdress,
                 (error, results, fields) => {
                     if (error) {
-                        console.log(error);
                         next({
                             statusCode: 500,
-                            result: 'Internal server error.',
+                            message: 'Internal server error.',
                         });
                     } else if (results.length > 0) {
                         next({
                             statusCode: 409,
-                            result: 'User is already registered.',
+                            message: 'User is already registered.',
                         });
                     } else {
                         connection.query(
@@ -180,11 +124,10 @@ module.exports = {
                                 lastName,
                                 street,
                                 city,
-                                emailAddress,
+                                emailAdress,
                                 password,
                             ],
                             (error, results, fields) => {
-                                console.log(error);
                                 connection.release();
 
                                 if (error) {
@@ -193,10 +136,11 @@ module.exports = {
                                         result: 'Internal servor error',
                                     });
                                 } else {
-                                    res.status(200).json({
+                                    res.status(201).json({
                                         statusCode: 201,
                                         result: {
-                                            username: `${firstName} ${lastName}`,
+                                            id: results.insertId,
+                                            ...req.body,
                                         },
                                     });
                                 }
@@ -220,7 +164,7 @@ module.exports = {
             if (err) {
                 next({
                     statusCode: 500,
-                    result: 'Internal servor error',
+                    message: 'Internal server error',
                 });
                 return;
             }
@@ -234,12 +178,12 @@ module.exports = {
                     if (error) {
                         next({
                             statusCode: 500,
-                            result: 'Internal servor error',
+                            message: 'Internal servor error',
                         });
                     } else if (!results.length > 0) {
                         next({
                             statusCode: 404,
-                            result: 'User is not registered.',
+                            message: 'User is not registered.',
                         });
                     } else {
                         res.status(200).json({
@@ -253,11 +197,11 @@ module.exports = {
     },
 
     updateUser: (req, res, next) => {
-        DBConnection.getConnection((err, connection) => {
-            if (err) {
+        DBConnection.getConnection((error, connection) => {
+            if (error) {
                 next({
                     statusCode: 500,
-                    result: 'Internal servor error',
+                    message: 'Internal servor error',
                 });
                 return;
             }
@@ -268,10 +212,11 @@ module.exports = {
                 street,
                 city,
                 password,
-                emailAddres,
-                isActive,
+                emailAdress,
                 phoneNumber,
             } = req.body;
+
+            const isActive = req.body.isActive ? 1 : 0;
 
             connection.query(
                 'SELECT * FROM `user` WHERE id = ?;',
@@ -280,7 +225,7 @@ module.exports = {
                     if (error) {
                         next({
                             statusCode: 500,
-                            result: 'Internal server error.',
+                            message: 'Internal server error.',
                         });
                     } else if (!results.length > 0) {
                         next({
@@ -289,31 +234,52 @@ module.exports = {
                         });
                     } else {
                         connection.query(
-                            'UPDATE `user` SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ? WHERE id = ?;',
-                            [
-                                firstName,
-                                lastName,
-                                street,
-                                city,
-                                emailAddres,
-                                password,
-                                req.params.id,
-                            ],
+                            'SELECT count(emailAdress) as count from user WHERE emailAdress = ? AND id <> ?',
+                            [emailAdress, req.params.id],
                             (error, results, fields) => {
-                                connection.release();
-
                                 if (error) {
+                                    console.log(error);
                                     next({
                                         statusCode: 500,
-                                        result: 'Internal servor error',
+                                        message: 'Internal server error',
+                                    });
+                                } else if (results[0].count >= 1) {
+                                    next({
+                                        statusCode: 400,
+                                        message: 'Email is already registered',
                                     });
                                 } else {
-                                    res.status(200).json({
-                                        statusCode: 200,
-                                        result: {
-                                            username: `${firstName} ${lastName}`,
-                                        },
-                                    });
+                                    connection.query(
+                                        'UPDATE `user` SET firstName = ?, lastName = ?, street = ?, city = ?, emailAdress = ?, password = ?, isActive = ?, phoneNumber = ? WHERE id = ?;',
+                                        [
+                                            firstName,
+                                            lastName,
+                                            street,
+                                            city,
+                                            emailAdress,
+                                            password,
+                                            isActive,
+                                            phoneNumber,
+                                            req.params.id,
+                                        ],
+                                        (error, results, fields) => {
+                                            connection.release();
+
+                                            if (error) {
+                                                next({
+                                                    statusCode: 500,
+                                                    result: 'Internal servor error',
+                                                });
+                                            } else {
+                                                res.status(200).json({
+                                                    statusCode: 200,
+                                                    result: {
+                                                        username: `${firstName} ${lastName}`,
+                                                    },
+                                                });
+                                            }
+                                        }
+                                    );
                                 }
                             }
                         );
@@ -338,7 +304,6 @@ module.exports = {
                 req.params.id,
                 (error, results, fields) => {
                     connection.release();
-
                     if (error) {
                         next({
                             statusCode: 500,
@@ -346,12 +311,13 @@ module.exports = {
                         });
                     } else if (!results.affectedRows > 0) {
                         next({
-                            statusCode: 404,
-                            result: 'User is not registered.',
+                            statusCode: 400,
+                            message: 'User does not exist',
                         });
                     } else {
                         res.status(200).json({
                             statusCode: 200,
+                            message: 'User deleted',
                         });
                     }
                 }
