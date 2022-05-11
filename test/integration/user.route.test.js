@@ -320,7 +320,7 @@ describe('Manage users /api/user', () => {
         });
     });
 
-    describe('UC-203 request user profile', () => {
+    describe('UC-203 request user profile /api/user/profile', () => {
         it('TC-203-1 should return a valid statusCode with error message since it is not implemented', (done) => {
             chai.request(server)
                 .get('/api/user/profile')
@@ -338,6 +338,30 @@ describe('Manage users /api/user', () => {
                     message.should.be
                         .an('string')
                         .that.contains('Functionality has not been implemented yet');
+
+                    done();
+                });
+        });
+    });
+
+    describe('UC-204 request user details /api/user/:id', () => {
+        it('TC-204-2 should return a valid statusCode with error message since when user does not exist', (done) => {
+            chai.request(server)
+                .get('/api/user/9999999')
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('User is not registered.');
 
                     done();
                 });
