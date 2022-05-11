@@ -312,7 +312,7 @@ module.exports = {
                     } else if (!results.affectedRows > 0) {
                         next({
                             statusCode: 400,
-                            message: 'User is not registered',
+                            message: 'User does not exist',
                         });
                     } else {
                         res.status(200).json({
