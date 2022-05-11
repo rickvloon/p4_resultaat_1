@@ -220,7 +220,7 @@ describe('Manage users /api/user', () => {
                 if (err) throw err;
 
                 connection.query(
-                    CLEAR_DB,
+                    CLEAR_DB + INSERT_USER,
                     function (error, results, fields) {
                         connection.release();
 
@@ -232,7 +232,45 @@ describe('Manage users /api/user', () => {
             });
         });
 
-        it.only('TC-202-1 should return an empty array when no users are registered', () => {
+        describe('without users', () => {
+            beforeEach((done) => {
+                DBConnection.getConnection(function (err, connection) {
+                    if (err) throw err;
+
+                    connection.query(
+                        CLEAR_DB,
+                        function (error, results, fields) {
+                            connection.release();
+
+                            if (error) throw error;
+
+                            done();
+                        }
+                    );
+                });
+            });
+
+            it('TC-202-1 should return an empty array when no users are registered', (done) => {
+                chai.request(server)
+                    .get('/api/user')
+                    .end((err, res) => {
+                        res.should.have.status(200);
+                        res.should.be.an('object');
+
+                        res.body.should.be
+                            .an('object')
+                            .that.has.keys('statusCode', 'result');
+
+                        const { result } = res.body;
+
+                        result.should.be.an('array').that.is.empty;
+
+                        done();
+                    });
+            });
+        });
+
+        it('TC-202-2 should return an array of users when two users are registered', (done) => {
             chai.request(server)
                 .get('/api/user')
                 .end((err, res) => {
@@ -245,7 +283,37 @@ describe('Manage users /api/user', () => {
 
                     const { result } = res.body;
 
-                    result.should.be.an('array').that.is.empty;
+                    result.should.be.an('array').that.has.lengthOf(2);
+
+                    result[0].should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'firstName',
+                            'lastName',
+                            'password',
+                            'street',
+                            'city',
+                            'id',
+                            'emailAdress',
+                            'isActive',
+                            'roles',
+                            'phoneNumber'
+                        );
+
+                    result[1].should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'firstName',
+                            'lastName',
+                            'password',
+                            'street',
+                            'city',
+                            'id',
+                            'emailAdress',
+                            'isActive',
+                            'roles',
+                            'phoneNumber'
+                        );
 
                     done();
                 });
