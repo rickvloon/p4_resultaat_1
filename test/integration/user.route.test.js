@@ -113,7 +113,12 @@ describe('Manage users /api/user', () => {
                 .send({
                     firstName: 'John',
                     lastName: 'Doe',
-                    password: '123_$_',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    emailAdress: 'invalidemail',
+                    password: '&*%_$@',
+                    isActive: true,
+                    phoneNumber: '12345678',
                 })
                 .end((err, res) => {
                     assert.ifError(err);
@@ -122,11 +127,11 @@ describe('Manage users /api/user', () => {
 
                     res.body.should.be
                         .an('object')
-                        .that.has.all.keys('statusCode', 'result');
+                        .that.has.all.keys('statusCode', 'message');
 
-                    const { statusCode, result } = res.body;
+                    const { statusCode, message } = res.body;
                     statusCode.should.be.an('number');
-                    result.should.be
+                    message.should.be
                         .an('string')
                         .that.contains('password must be a valid password');
 
