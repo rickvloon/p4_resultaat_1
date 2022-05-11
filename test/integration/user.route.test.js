@@ -419,4 +419,192 @@ describe('Manage users /api/user', () => {
                 });
         });
     });
+
+    describe('UC-205 update user /api/user', () => {
+        beforeEach((done) => {
+            DBConnection.getConnection(function (err, connection) {
+                if (err) throw err;
+
+                connection.query(
+                    CLEAR_DB + INSERT_USER,
+                    function (error, results, fields) {
+                        connection.release();
+
+                        if (error) throw error;
+
+                        done();
+                    }
+                );
+            });
+        });
+
+        it('TC-205-1 should return a valid error when required input is missing', (done) => {
+            chai.request(server)
+                .put('/api/user/1')
+                .send({
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    password: 'secret',
+                    isActive: true,
+                    phoneNumber: '12345678',
+                })
+                .end((err, res) => {
+                    assert.ifError(err);
+                    console.log(res.body);
+                    res.should.have.status(400);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('emailAdress is a required field');
+
+                    done();
+                });
+        });
+
+        it('TC-201-2 should return a valid error when email address is invalid', (done) => {
+            chai.request(server)
+                .post('/api/user')
+                .send({
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    emailAdress: 'invalidemail',
+                    password: 'secret',
+                    isActive: true,
+                    phoneNumber: '12345678',
+                })
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(400);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('emailAdress must be a valid email');
+
+                    done();
+                });
+        });
+
+        it('TC-201-3 should return a valid error when password is invalid', (done) => {
+            chai.request(server)
+                .post('/api/user')
+                .send({
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    emailAdress: 'invalidemail',
+                    password: '&*%_$@',
+                    isActive: true,
+                    phoneNumber: '12345678',
+                })
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(400);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('password must be a valid password');
+
+                    done();
+                });
+        });
+
+        it('TC-201-4 should return a valid status and message when a user is already registered', (done) => {
+            chai.request(server)
+                .post('/api/user')
+                .send({
+                    firstName: 'Server',
+                    lastName: 'server',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    emailAdress: 'name@server.nl',
+                    password: '123',
+                    isActive: true,
+                    phoneNumber: '12345678',
+                })
+                .end((err, res) => {
+                    res.should.have.status(409);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('User is already registered');
+
+                    done();
+                });
+        });
+
+        it('TC-201-5 should return a valid status and response with user after registering the user', (done) => {
+            chai.request(server)
+                .post('/api/user')
+                .send({
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    emailAdress: 'rick@gmail.com',
+                    password: '123',
+                    isActive: true,
+                    phoneNumber: '12345678',
+                })
+                .end((err, res) => {
+                    res.should.have.status(201);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'result');
+
+                    const { result } = res.body;
+
+                    result.should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'firstName',
+                            'lastName',
+                            'password',
+                            'street',
+                            'city',
+                            'id',
+                            'emailAdress',
+                            'isActive',
+                            'phoneNumber'
+                        );
+
+                    done();
+                });
+        });
+    });
 });
