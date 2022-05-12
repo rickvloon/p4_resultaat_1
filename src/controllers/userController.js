@@ -59,33 +59,32 @@ module.exports = {
     },
 
     getAllUsers: (req, res, next) => {
-        DBConnection.getConnection((err, connection) => {
-            if (err) {
+        DBConnection.getConnection((error, connection) => {
+            if (error) {
                 next({
                     statusCode: 500,
                     message: 'Internal servor error',
                 });
-                return;
-            }
+            } else {
+                connection.query(
+                    'SELECT * FROM `user`;',
+                    (error, results, fields) => {
+                        connection.release();
 
-            connection.query(
-                'SELECT * FROM `user`;',
-                (error, results, fields) => {
-                    connection.release();
-
-                    if (error) {
-                        next({
-                            statusCode: 500,
-                            message: 'Internal servor error',
-                        });
+                        if (error) {
+                            next({
+                                statusCode: 500,
+                                message: 'Internal servor error',
+                            });
+                        } else {
+                            res.status(200).json({
+                                statusCode: 200,
+                                result: results,
+                            });
+                        }
                     }
-
-                    res.status(200).json({
-                        statusCode: 200,
-                        result: results,
-                    });
-                }
-            );
+                );
+            }
         });
     },
 

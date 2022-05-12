@@ -39,6 +39,33 @@ module.exports = {
         }
     },
 
+    validateToken: (req, res, next) => {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader) {
+            next({
+                statusCode: 401,
+                message: 'Unauthorized',
+            });
+        } else {
+            const token = authHeader.substring(7, authHeader.length);
+
+            jwt.verify(token, process.env.JWT_SECRET, (error, payload) => {
+                if (error) {
+                    next({
+                        statusCode: 401,
+                        message: 'Unauthorized',
+                    });
+                }
+
+                if (payload) {
+                    req.body.userId = payload.userId;
+                    next();
+                }
+            });
+        }
+    },
+
     login: (req, res, next) => {
         const { emailAdress, password } = req.body;
 
