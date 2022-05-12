@@ -274,7 +274,7 @@ module.exports = {
                                                     statusCode: 200,
                                                     result: {
                                                         id: req.params.id,
-                                                        ...req.body
+                                                        ...req.body,
                                                     },
                                                 });
                                             }
