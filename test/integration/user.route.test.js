@@ -6,6 +6,7 @@ const chaiHttp = require('chai-http');
 const server = require('../../src/index');
 require('dotenv').config();
 const DBConnection = require('../../database/DBConnection');
+const jwt = require('jsonwebtoken');
 
 chai.should();
 chai.use(chaiHttp);
@@ -253,6 +254,10 @@ describe('Manage users /api/user', () => {
             it('TC-202-1 should return an empty array when no users are registered', (done) => {
                 chai.request(server)
                     .get('/api/user')
+                    .set(
+                        'authorization',
+                        'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                    )
                     .end((err, res) => {
                         res.should.have.status(200);
                         res.should.be.an('object');
@@ -273,6 +278,10 @@ describe('Manage users /api/user', () => {
         it('TC-202-2 should return an array of users when two users are registered', (done) => {
             chai.request(server)
                 .get('/api/user')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.should.be.an('object');
@@ -324,6 +333,10 @@ describe('Manage users /api/user', () => {
         it('TC-203-1 should return a valid statusCode with error message since it is not implemented', (done) => {
             chai.request(server)
                 .get('/api/user/profile')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
                 .end((err, res) => {
                     res.should.have.status(401);
                     res.should.be.an('object');
@@ -364,9 +377,39 @@ describe('Manage users /api/user', () => {
             });
         });
 
+        it('TC-204-1 should return a valid statusCode with error message when there is an invalid token', (done) => {
+            chai.request(server)
+                .get('/api/user/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, 'somerandomkey')
+                )
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Unauthorized');
+
+                    done();
+                });
+        });
+
         it('TC-204-2 should return a valid statusCode with error message when user does not exist', (done) => {
             chai.request(server)
                 .get('/api/user/9999999')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
                 .end((err, res) => {
                     res.should.have.status(404);
                     res.should.be.an('object');
@@ -389,6 +432,10 @@ describe('Manage users /api/user', () => {
         it('TC-204-3 should return a valid statusCode with user when user is registered', (done) => {
             chai.request(server)
                 .get('/api/user/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.should.be.an('object');
@@ -441,6 +488,10 @@ describe('Manage users /api/user', () => {
         it('TC-205-1 should return a valid error when required input is missing', (done) => {
             chai.request(server)
                 .put('/api/user/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
                 .send({
                     firstName: 'John',
                     lastName: 'Doe',
@@ -471,7 +522,11 @@ describe('Manage users /api/user', () => {
 
         it('TC-205-4 should return a valid statuscode and error message when user does not exist', (done) => {
             chai.request(server)
-                .put('/api/user/999999999')
+                .put('/api/user/999')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 999 }, process.env.JWT_SECRET)
+                )
                 .send({
                     firstName: 'John',
                     lastName: 'Doe',
@@ -501,9 +556,49 @@ describe('Manage users /api/user', () => {
                 });
         });
 
+        it('TC-205-5 should return a valid statuscode and error message when user is not signed in', (done) => {
+            chai.request(server)
+                .put('/api/user/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 2 }, process.env.JWT_SECRET)
+                )
+                .send({
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    street: 'Lovensdijkstraat 61',
+                    city: 'Breda',
+                    emailAdress: 'test@gmail.com',
+                    password: 'secret',
+                    isActive: true,
+                    phoneNumber: '12345678',
+                })
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(401);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Unauthorized');
+
+                    done();
+                });
+        });
+
         it('TC-205-6 should return a valid statusCode and user when succesfully registered', (done) => {
             chai.request(server)
                 .put('/api/user/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
                 .send({
                     firstName: 'John',
                     lastName: 'Doe',
@@ -565,7 +660,11 @@ describe('Manage users /api/user', () => {
 
         it('TC-206-1 should return a valid statusCode with error message when user does not exist', (done) => {
             chai.request(server)
-                .delete('/api/user/999999')
+                .delete('/api/user/999')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 999 }, process.env.JWT_SECRET)
+                )
                 .end((err, res) => {
                     res.should.have.status(400);
                     res.should.be.an('object');
@@ -585,9 +684,39 @@ describe('Manage users /api/user', () => {
                 });
         });
 
+        it('TC-206-2 should return a valid statusCode with error message when user is nog signed in', (done) => {
+            chai.request(server)
+                .delete('/api/user/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 2 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Unauthorized');
+
+                    done();
+                });
+        });
+
         it('TC-206-4 should return a valid statusCode with succes message when user is deleted', (done) => {
             chai.request(server)
                 .delete('/api/user/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.should.be.an('object');

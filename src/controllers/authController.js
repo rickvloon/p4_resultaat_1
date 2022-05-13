@@ -59,7 +59,7 @@ module.exports = {
                 }
 
                 if (payload) {
-                    req.body.userId = payload.userId;
+                    req.body.id = payload.id;
                     next();
                 }
             });
@@ -99,7 +99,7 @@ module.exports = {
 
                         if (user.password === password) {
                             jwt.sign(
-                                { userId: user.id },
+                                { id: user.id },
                                 process.env.JWT_SECRET,
                                 { expiresIn: '7d' },
                                 (error, token) => {
