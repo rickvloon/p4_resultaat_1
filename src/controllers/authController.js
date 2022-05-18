@@ -112,7 +112,10 @@ module.exports = {
 
                                     res.status(200).json({
                                         statusCode: 200,
-                                        result: token,
+                                        result: {
+                                            ...results[0],
+                                            token
+                                        },
                                     });
                                 }
                             );
