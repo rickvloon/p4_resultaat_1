@@ -44,6 +44,9 @@ module.exports = {
                     'any.required': 'emailAdress is a required field',
                     'string.email': 'emailAdress must be a valid email',
                 }),
+            id: Joi.number().messages({
+                'number.base': 'id should be a number',
+            }),
         });
 
         const { error } = schema.validate(user);
@@ -59,33 +62,32 @@ module.exports = {
     },
 
     getAllUsers: (req, res, next) => {
-        DBConnection.getConnection((err, connection) => {
-            if (err) {
+        DBConnection.getConnection((error, connection) => {
+            if (error) {
                 next({
                     statusCode: 500,
                     message: 'Internal servor error',
                 });
-                return;
-            }
+            } else {
+                connection.query(
+                    'SELECT * FROM `user`;',
+                    (error, results, fields) => {
+                        connection.release();
 
-            connection.query(
-                'SELECT * FROM `user`;',
-                (error, results, fields) => {
-                    connection.release();
-
-                    if (error) {
-                        next({
-                            statusCode: 500,
-                            message: 'Internal servor error',
-                        });
+                        if (error) {
+                            next({
+                                statusCode: 500,
+                                message: 'Internal servor error',
+                            });
+                        } else {
+                            res.status(200).json({
+                                statusCode: 200,
+                                result: results,
+                            });
+                        }
                     }
-
-                    res.status(200).json({
-                        statusCode: 200,
-                        result: results,
-                    });
-                }
-            );
+                );
+            }
         });
     },
 
@@ -197,13 +199,19 @@ module.exports = {
     },
 
     updateUser: (req, res, next) => {
+        if (req.body.id != req.params.id) {
+            return next({
+                statusCode: 401,
+                message: 'Unauthorized',
+            });
+        }
+
         DBConnection.getConnection((error, connection) => {
             if (error) {
-                next({
+                return next({
                     statusCode: 500,
                     message: 'Internal servor error',
                 });
-                return;
             }
 
             const {
@@ -273,8 +281,7 @@ module.exports = {
                                                 res.status(200).json({
                                                     statusCode: 200,
                                                     result: {
-                                                        id: req.params.id,
-                                                        ...req.body
+                                                        ...req.body,
                                                     },
                                                 });
                                             }
@@ -290,6 +297,12 @@ module.exports = {
     },
 
     deleteUser: (req, res, next) => {
+        if (req.body.id != req.params.id) {
+            return next({
+                statusCode: 401,
+                message: 'Unauthorized',
+            });
+        }
         DBConnection.getConnection((err, connection) => {
             if (err) {
                 next({
