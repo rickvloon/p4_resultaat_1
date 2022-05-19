@@ -217,8 +217,8 @@ describe('Manage users /api/user', () => {
         });
     });
 
-    describe('UC-202 Overview of users', () => {
-        describe('without users /api/user', () => {
+    describe('UC-202 Overview of users /api/user', () => {
+        describe('without users', () => {
             beforeEach((done) => {
                 DBConnection.getConnection(function (err, connection) {
                     if (err) throw err;
