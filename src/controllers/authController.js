@@ -7,7 +7,7 @@ module.exports = {
     validateLogin: (req, res, next) => {
         const schema = Joi.object({
             password: Joi.string()
-                .pattern(new RegExp('^[a-zA-Z0-9]{3,30}$'))
+                .pattern(/^(?=.*\d)(?=.*[A-Z]).{8,}$/)
                 .required()
                 .messages({
                     'string.base': 'password should be a string',

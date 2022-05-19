@@ -62,6 +62,23 @@ module.exports = {
     },
 
     getAllUsers: (req, res, next) => {
+        let { name, isActive } = req.query;
+
+        let queryString = 'SELECT * FROM `user`';
+
+        if (name || isActive) {
+            queryString += ' WHERE ';
+            if (name) {
+                queryString += 'firstName LIKE ?';
+                name = '%' + name + '%';
+            }
+
+            if (name && isActive) queryString += ' AND ';
+            if (isActive) {
+                queryString += '`isActive` = ?'
+            }
+        }
+
         DBConnection.getConnection((error, connection) => {
             if (error) {
                 next({
@@ -70,7 +87,8 @@ module.exports = {
                 });
             } else {
                 connection.query(
-                    'SELECT * FROM `user`;',
+                    queryString,
+                    [name, isActive].filter((v)=> v != null),
                     (error, results, fields) => {
                         connection.release();
 
