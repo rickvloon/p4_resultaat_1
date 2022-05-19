@@ -6,7 +6,6 @@ const chaiHttp = require('chai-http');
 const server = require('../../src/index');
 require('dotenv').config();
 const DBConnection = require('../../database/DBConnection');
-const jwt = require('jsonwebtoken');
 
 chai.should();
 chai.use(chaiHttp);
@@ -19,8 +18,8 @@ const CLEAR_DB =
 
 const INSERT_USER =
     'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
-    '(1, "first", "last", "name@server.nl", "secret", "street", "city"),' +
-    '(2, "first", "last", "second@server.nl", "secret", "street", "city");';
+    '(1, "first", "last", "name@server.nl", "12345678A", "street", "city"),' +
+    '(2, "first", "last", "second@server.nl", "12345678A", "street", "city");';
 
 const INSERT_MEALS =
     'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
@@ -76,7 +75,7 @@ describe('Authentication /api/auth/', () => {
                 .post('/api/auth/login')
                 .send({
                     emailAdress: 'invalidemail',
-                    password: 'secret',
+                    password: '12345678A',
                 })
                 .end((err, res) => {
                     assert.ifError(err);
@@ -102,7 +101,7 @@ describe('Authentication /api/auth/', () => {
                 .post('/api/auth/login')
                 .send({
                     emailAdress: 'name@server.nl',
-                    password: '$',
+                    password: 'invalidpassword',
                 })
                 .end((err, res) => {
                     assert.ifError(err);
@@ -123,12 +122,12 @@ describe('Authentication /api/auth/', () => {
                 });
         });
 
-        it.only('TC-201-4 should return a valid status and error message when user is not registered', (done) => {
+        it('TC-201-4 should return a valid status and error message when user is not registered', (done) => {
             chai.request(server)
                 .post('/api/auth/login')
                 .send({
                     emailAdress: 'unregistered@server.nl',
-                    password: 'secret',
+                    password: '12345678A',
                 })
                 .end((err, res) => {
                     assert.ifError(err);
@@ -149,12 +148,12 @@ describe('Authentication /api/auth/', () => {
                 });
         });
 
-        it.only('TC-201-5 should return a valid statusCode and user details and token when succesfully registered', (done) => {
+        it('TC-201-5 should return a valid statusCode and user details and token when succesfully registered', (done) => {
             chai.request(server)
                 .post('/api/auth/login')
                 .send({
                     emailAdress: 'name@server.nl',
-                    password: 'secret',
+                    password: '12345678A',
                 })
                 .end((err, res) => {
                     assert.ifError(err);

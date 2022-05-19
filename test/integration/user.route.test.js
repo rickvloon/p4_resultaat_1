@@ -19,8 +19,8 @@ const CLEAR_DB =
 
 const INSERT_USER =
     'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
-    '(1, "first", "last", "name@server.nl", "secret", "street", "city"),' +
-    '(2, "first", "last", "second@server.nl", "secret", "street", "city");';
+    '(1, "first", "last", "name@server.nl", "12345678A", "street", "city"),' +
+    '(2, "first", "last", "second@server.nl", "12345678A", "street", "city");';
 
 const INSERT_MEALS =
     'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
@@ -54,7 +54,7 @@ describe('Manage users /api/user', () => {
                     lastName: 'Doe',
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
-                    password: 'secret',
+                    password: '12345678A',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
@@ -86,7 +86,7 @@ describe('Manage users /api/user', () => {
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
                     emailAdress: 'invalidemail',
-                    password: 'secret',
+                    password: '12345678A',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
@@ -497,7 +497,7 @@ describe('Manage users /api/user', () => {
                     lastName: 'Doe',
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
-                    password: 'secret',
+                    password: '12345678A',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
@@ -533,7 +533,7 @@ describe('Manage users /api/user', () => {
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
                     emailAdress: 'test@gmail.com',
-                    password: 'secret',
+                    password: '12345678A',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
@@ -569,7 +569,7 @@ describe('Manage users /api/user', () => {
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
                     emailAdress: 'test@gmail.com',
-                    password: 'secret',
+                    password: '12345678A',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
@@ -605,7 +605,7 @@ describe('Manage users /api/user', () => {
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
                     emailAdress: 'update@gmail.com',
-                    password: 'secret',
+                    password: '12345678A',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
