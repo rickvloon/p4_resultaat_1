@@ -1,5 +1,6 @@
 const DBConnection = require('../../database/DBConnection');
 const Joi = require('joi');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     validateUser: (req, res, next) => {
@@ -75,7 +76,7 @@ module.exports = {
 
             if (name && isActive) queryString += ' AND ';
             if (isActive) {
-                queryString += '`isActive` = ?'
+                queryString += '`isActive` = ?';
             }
         }
 
@@ -88,7 +89,7 @@ module.exports = {
             } else {
                 connection.query(
                     queryString,
-                    [name, isActive].filter((v)=> v != null),
+                    [name, isActive].filter((v) => v != null),
                     (error, results, fields) => {
                         connection.release();
 
@@ -173,9 +174,43 @@ module.exports = {
     },
 
     getUserProfile: (req, res, next) => {
-        next({
-            statusCode: 401,
-            message: 'Functionality has not been implemented yet',
+        const authHeader = req.headers.authorization;
+        const token = authHeader.substring(7, authHeader.length);
+        const decoded = jwt.decode(token);
+
+        DBConnection.getConnection((err, connection) => {
+            if (err) {
+                next({
+                    statusCode: 500,
+                    message: 'Internal server error',
+                });
+                return;
+            }
+
+            connection.query(
+                'SELECT * FROM `user` WHERE id = ?;',
+                decoded.id,
+                (error, results, fields) => {
+                    connection.release();
+
+                    if (error) {
+                        next({
+                            statusCode: 500,
+                            message: 'Internal servor error',
+                        });
+                    } else if (!results.length > 0) {
+                        next({
+                            statusCode: 404,
+                            message: 'User is not registered.',
+                        });
+                    } else {
+                        res.status(200).json({
+                            statusCode: 200,
+                            result: results[0],
+                        });
+                    }
+                }
+            );
         });
     },
 

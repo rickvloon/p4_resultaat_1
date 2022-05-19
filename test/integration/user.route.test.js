@@ -29,23 +29,24 @@ const INSERT_MEALS =
     "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);";
 
 describe('Manage users /api/user', () => {
-    describe('UC-201 add user /api/user', () => {
-        beforeEach((done) => {
-            DBConnection.getConnection(function (err, connection) {
-                if (err) throw err;
+    beforeEach((done) => {
+        DBConnection.getConnection(function (err, connection) {
+            if (err) throw err;
 
-                connection.query(
-                    CLEAR_DB + INSERT_USER,
-                    function (error, results, fields) {
-                        connection.release();
+            connection.query(
+                CLEAR_DB + INSERT_USER,
+                function (error, results, fields) {
+                    connection.release();
 
-                        if (error) throw error;
+                    if (error) throw error;
 
-                        done();
-                    }
-                );
-            });
+                    done();
+                }
+            );
         });
+    });
+
+    describe('UC-201 add user /api/user', () => {
 
         it('TC-201-1 should return a valid error when required input is missing', (done) => {
             chai.request(server)
@@ -217,23 +218,6 @@ describe('Manage users /api/user', () => {
     });
 
     describe('UC-202 Overview of users', () => {
-        beforeEach((done) => {
-            DBConnection.getConnection(function (err, connection) {
-                if (err) throw err;
-
-                connection.query(
-                    CLEAR_DB + INSERT_USER,
-                    function (error, results, fields) {
-                        connection.release();
-
-                        if (error) throw error;
-
-                        done();
-                    }
-                );
-            });
-        });
-
         describe('without users /api/user', () => {
             beforeEach((done) => {
                 DBConnection.getConnection(function (err, connection) {
@@ -474,12 +458,12 @@ describe('Manage users /api/user', () => {
     });
 
     describe('UC-203 request user profile /api/user/profile', () => {
-        it('TC-203-1 should return a valid statusCode with error message since it is not implemented', (done) => {
+        it('TC-203-1 should return a valid statusCode with error message when there is an invalid token', (done) => {
             chai.request(server)
                 .get('/api/user/profile')
                 .set(
                     'authorization',
-                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                    'Bearer ' + jwt.sign({ id: 1 }, 'somerandomkey')
                 )
                 .end((err, res) => {
                     res.should.have.status(401);
@@ -494,8 +478,43 @@ describe('Manage users /api/user', () => {
                     statusCode.should.be.an('number');
                     message.should.be
                         .an('string')
-                        .that.contains(
-                            'Functionality has not been implemented yet'
+                        .that.contains('Unauthorized');
+
+                    done();
+                });
+        });
+
+        it('TC-203-2 should return a valid statusCode with user when token is valid and user exists', (done) => {
+            chai.request(server)
+                .get('/api/user/profile')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'result');
+
+                    const { statusCode, result } = res.body;
+
+                    statusCode.should.be.an('number');
+                    result.should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'firstName',
+                            'lastName',
+                            'password',
+                            'street',
+                            'city',
+                            'id',
+                            'emailAdress',
+                            'isActive',
+                            'roles',
+                            'phoneNumber'
                         );
 
                     done();
@@ -504,23 +523,6 @@ describe('Manage users /api/user', () => {
     });
 
     describe('UC-204 request user details /api/user/:id', () => {
-        beforeEach((done) => {
-            DBConnection.getConnection(function (err, connection) {
-                if (err) throw err;
-
-                connection.query(
-                    CLEAR_DB + INSERT_USER,
-                    function (error, results, fields) {
-                        connection.release();
-
-                        if (error) throw error;
-
-                        done();
-                    }
-                );
-            });
-        });
-
         it('TC-204-1 should return a valid statusCode with error message when there is an invalid token', (done) => {
             chai.request(server)
                 .get('/api/user/1')
@@ -573,7 +575,7 @@ describe('Manage users /api/user', () => {
                 });
         });
 
-        it('TC-204-3 should return a valid statusCode with user when user is registered', (done) => {
+        it('TC-204-3 should return a valid statusCode with user when user is retrieved', (done) => {
             chai.request(server)
                 .get('/api/user/1')
                 .set(
@@ -612,22 +614,6 @@ describe('Manage users /api/user', () => {
     });
 
     describe('UC-205 update user /api/user', () => {
-        beforeEach((done) => {
-            DBConnection.getConnection(function (err, connection) {
-                if (err) throw err;
-
-                connection.query(
-                    CLEAR_DB + INSERT_USER,
-                    function (error, results, fields) {
-                        connection.release();
-
-                        if (error) throw error;
-
-                        done();
-                    }
-                );
-            });
-        });
 
         it('TC-205-1 should return a valid error when required input is missing', (done) => {
             chai.request(server)
@@ -785,22 +771,6 @@ describe('Manage users /api/user', () => {
     });
 
     describe('UC-206 delete user /api/user', () => {
-        beforeEach((done) => {
-            DBConnection.getConnection(function (err, connection) {
-                if (err) throw err;
-
-                connection.query(
-                    CLEAR_DB + INSERT_USER,
-                    function (error, results, fields) {
-                        connection.release();
-
-                        if (error) throw error;
-
-                        done();
-                    }
-                );
-            });
-        });
 
         it('TC-206-1 should return a valid statusCode with error message when user does not exist', (done) => {
             chai.request(server)

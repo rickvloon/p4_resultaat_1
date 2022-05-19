@@ -114,7 +114,7 @@ module.exports = {
                                         statusCode: 200,
                                         result: {
                                             ...results[0],
-                                            token
+                                            token,
                                         },
                                     });
                                 }
