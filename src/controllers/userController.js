@@ -73,7 +73,7 @@ module.exports = {
                 name = '%' + name + '%';
             }
 
-            if (name && isActive) queryString += 'AND';
+            if (name && isActive) queryString += ' AND ';
             if (isActive) {
                 queryString += '`isActive` = ?'
             }
@@ -91,7 +91,6 @@ module.exports = {
                     [name, isActive].filter((v)=> v != null),
                     (error, results, fields) => {
                         connection.release();
-                        console.log(queryString);
 
                         if (error) {
                             next({

@@ -7,6 +7,7 @@ const server = require('../../src/index');
 require('dotenv').config();
 const DBConnection = require('../../database/DBConnection');
 const jwt = require('jsonwebtoken');
+const { expect } = require('chai');
 
 chai.should();
 chai.use(chaiHttp);
@@ -18,9 +19,9 @@ const CLEAR_DB =
     CLEAR_MEAL_TABLE + CLEAR_PARTICIPANTS_TABLE + CLEAR_USERS_TABLE;
 
 const INSERT_USER =
-    'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
-    '(1, "first", "last", "name@server.nl", "12345678A", "street", "city"),' +
-    '(2, "first", "last", "second@server.nl", "12345678A", "street", "city");';
+    'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city`, `isActive` ) VALUES' +
+    '(1, "first", "last", "name@server.nl", "12345678A", "street", "city", 0),' +
+    '(2, "uniquename", "fasfasfas", "second@server.nl", "12345678A", "street", "city", 1);';
 
 const INSERT_MEALS =
     'INSERT INTO `meal` (`id`, `name`, `description`, `imageUrl`, `dateTime`, `maxAmountOfParticipants`, `price`, `cookId`) VALUES' +
@@ -323,6 +324,149 @@ describe('Manage users /api/user', () => {
                             'roles',
                             'phoneNumber'
                         );
+
+                    done();
+                });
+        });
+
+        it('TC-202-3 should return an empty array when filtered name does not exist', (done) => {
+            chai.request(server)
+                .get('/api/user/?name=somerandomname')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'result');
+
+                    const { result } = res.body;
+
+                    result.should.be.an('array').that.is.empty;
+
+                    done();
+                });
+        });
+
+        it('TC-202-4 should return an array of inactive users when filtered on isActive=0', (done) => {
+            chai.request(server)
+                .get('/api/user/?isActive=0')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'result');
+
+                    const { result } = res.body;
+
+                    result.should.be.an('array').that.has.lengthOf(1);
+
+                    result[0].should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'firstName',
+                            'lastName',
+                            'password',
+                            'street',
+                            'city',
+                            'id',
+                            'emailAdress',
+                            'isActive',
+                            'roles',
+                            'phoneNumber'
+                        );
+
+                    expect(result.map((user) => user.isActive)).to.include(0);
+
+                    done();
+                });
+        });
+
+        it('TC-202-5 should return an array of active users when filtered on isActive=1', (done) => {
+            chai.request(server)
+                .get('/api/user/?isActive=1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'result');
+
+                    const { result } = res.body;
+
+                    result.should.be.an('array').that.has.lengthOf(1);
+
+                    result[0].should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'firstName',
+                            'lastName',
+                            'password',
+                            'street',
+                            'city',
+                            'id',
+                            'emailAdress',
+                            'isActive',
+                            'roles',
+                            'phoneNumber'
+                        );
+
+                    expect(result.map((user) => user.isActive)).to.include(1);
+
+                    done();
+                });
+        });
+
+        it('TC-202-6 should return correct users with the searchterm in their name', (done) => {
+            chai.request(server)
+                .get('/api/user/?name=uniquename')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'result');
+
+                    const { result } = res.body;
+
+                    result.should.be.an('array').that.has.lengthOf(1);
+
+                    result[0].should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'firstName',
+                            'lastName',
+                            'password',
+                            'street',
+                            'city',
+                            'id',
+                            'emailAdress',
+                            'isActive',
+                            'roles',
+                            'phoneNumber'
+                        );
+
+                    result[0].firstName.should.contain('uniquename');
 
                     done();
                 });
