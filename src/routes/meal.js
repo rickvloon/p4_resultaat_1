@@ -10,6 +10,8 @@ router.get('/:id', mealController.getMeal);
 
 router.post('/', mealController.validateMeal, authController.validateToken, mealController.createMeal);
 
+router.put('/:id', mealController.updateMeal, mealController.getMeal);
+
 router.delete('/:id', authController.validateToken, mealController.deleteMeal);
 
 module.exports = router;

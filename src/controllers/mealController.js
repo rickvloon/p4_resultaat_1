@@ -241,6 +241,83 @@ module.exports = {
         });
     },
 
+    updateMeal: (req, res, next) => {
+        DBConnection.getConnection((err, connection) => {
+            if (err) {
+                connection.release();
+                return next({
+                    statusCode: 500,
+                    message: 'Internal server error',
+                });
+            }
+
+            connection.query(
+                'SELECT cookId from `meal` WHERE id = ?',
+                req.params.id,
+                (error, results, fields) => {
+                    if (error) {
+                        connection.release();
+                        return next({
+                            statusCode: 500,
+                            result: 'Internal servor error',
+                        });
+                    }
+
+                    const authHeader = req.headers.authorization;
+                    const token = authHeader.substring(7, authHeader.length);
+                    const decoded = jwt.decode(token);
+
+                    if (!results.length > 0) {
+                        connection.release();
+                        return next({
+                            statusCode: 404,
+                            message: 'Meal does not exist',
+                        });
+                    }
+
+                    if (decoded.id != results[0].cookId) {
+                        connection.release();
+                        return next({
+                            statusCode: 403,
+                            message: 'You are not the owner of this meal',
+                        });
+                    }
+
+                    const keys = Object.keys(req.body);
+
+                    const values = [];
+                    keys.forEach((key) => {
+                        if (key === 'allergenes') {
+                            req.body[key] = req.body[key].join(',');
+                        }
+                        values.push(req.body[key]);
+                    });
+
+                    keys[keys.length - 1] += ' = ?';
+                    const keyString = keys.join(' = ?, ');
+
+                    connection.query(
+                        'UPDATE `meal` SET ' + keyString + ' WHERE id = ?',
+                        [...values, req.params.id],
+                        (error, results, fields) => {
+                            connection.release();
+
+                            if (error) {
+                                connection.release();
+                                return next({
+                                    statusCode: 500,
+                                    message: 'Internal servor error',
+                                });
+                            }
+
+                            next();
+                        }
+                    );
+                }
+            );
+        });
+    },
+
     deleteMeal: (req, res, next) => {
         DBConnection.getConnection((err, connection) => {
             if (err) {
