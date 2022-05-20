@@ -111,10 +111,6 @@ module.exports = {
         });
     },
 
-    getMealDetails: (req, res, next) => {
-
-    },
-
     createUser: (req, res, next) => {
         DBConnection.getConnection((err, connection) => {
             if (err) {
