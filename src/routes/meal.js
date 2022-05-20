@@ -6,6 +6,8 @@ const authController = require('../controllers/authController');
 
 router.get('/', mealController.getAllMeals);
 
+router.get('/:id', mealController.getMealDetails);
+
 router.post('/', mealController.validateMeal, authController.validateToken, mealController.createMeal);
 
 router.delete('/:id', authController.validateToken, mealController.deleteMeal);

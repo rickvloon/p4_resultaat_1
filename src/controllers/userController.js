@@ -111,14 +111,17 @@ module.exports = {
         });
     },
 
-    createUser: async (req, res, next) => {
+    getMealDetails: (req, res, next) => {
+
+    },
+
+    createUser: (req, res, next) => {
         DBConnection.getConnection((err, connection) => {
             if (err) {
-                next({
+                return next({
                     statusCode: 500,
                     message: 'Internal servor error',
                 });
-                return;
             }
 
             const { firstName, lastName, street, city, password, emailAdress } =
