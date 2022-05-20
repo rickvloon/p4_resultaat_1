@@ -260,7 +260,11 @@ module.exports = {
     },
 
     updateUser: (req, res, next) => {
-        if (req.body.id != req.params.id) {
+        const authHeader = req.headers.authorization;
+        const token = authHeader.substring(7, authHeader.length);
+        const decoded = jwt.decode(token);
+
+        if (decoded.id != req.params.id) {
             return next({
                 statusCode: 401,
                 message: 'Unauthorized',
@@ -343,6 +347,7 @@ module.exports = {
                                                     statusCode: 200,
                                                     result: {
                                                         ...req.body,
+                                                        id: decoded.id
                                                     },
                                                 });
                                             }
@@ -358,7 +363,11 @@ module.exports = {
     },
 
     deleteUser: (req, res, next) => {
-        if (req.body.id != req.params.id) {
+        const authHeader = req.headers.authorization;
+        const token = authHeader.substring(7, authHeader.length);
+        const decoded = jwt.decode(token);
+
+        if (decoded.id != req.params.id) {
             return next({
                 statusCode: 401,
                 message: 'Unauthorized',

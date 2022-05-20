@@ -60,7 +60,6 @@ module.exports = {
                 }
 
                 if (payload) {
-                    req.body.id = payload.id;
                     next();
                 }
             });
