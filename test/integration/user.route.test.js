@@ -152,7 +152,7 @@ describe('Manage users /api/user', () => {
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
                     emailAdress: 'name@server.nl',
-                    password: '12345678A',
+                    password: '123',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
@@ -184,7 +184,7 @@ describe('Manage users /api/user', () => {
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
                     emailAdress: 'rick@gmail.com',
-                    password: '12345678A',
+                    password: '123',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
@@ -217,7 +217,7 @@ describe('Manage users /api/user', () => {
         });
     });
 
-    describe('UC-202 Overview of users /api/user', () => {
+    describe('UC-202 GET all users /api/user', () => {
         describe('without users', () => {
             beforeEach((done) => {
                 DBConnection.getConnection(function (err, connection) {
