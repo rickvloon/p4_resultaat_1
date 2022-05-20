@@ -63,7 +63,7 @@ module.exports = {
                 });
             } else {
                 connection.query(
-                    'SELECT meal.id, name, description, meal.isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, allergenes, cookId, firstName, lastName, street, city, user.isActive as userIsActive, emailAdress, password, phoneNumber FROM `meal` INNER JOIN `user` ON cookId = user.id;;',
+                    'SELECT meal.id, name, description, meal.isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, allergenes, cookId, firstName, lastName, street, city, user.isActive as userIsActive, emailAdress, password, phoneNumber FROM `meal` INNER JOIN `user` ON cookId = user.id;',
                     (error, results, fields) => {
                         connection.release();
                         if (error) {
@@ -107,6 +107,71 @@ module.exports = {
                     }
                 );
             }
+        });
+    },
+
+    getMeal: (req, res, next) => {
+        DBConnection.getConnection((err, connection) => {
+            if (err) {
+                next({
+                    statusCode: 500,
+                    message: 'Internal server error',
+                });
+                return;
+            }
+
+            connection.query(
+                'SELECT meal.id, name, description, meal.isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, allergenes, cookId, firstName, lastName, street, city, user.isActive as userIsActive, emailAdress, password, phoneNumber FROM `meal` INNER JOIN `user` ON cookId = user.id WHERE meal.id = ?',
+                req.params.id,
+                (error, results, fields) => {
+                    connection.release();
+
+                    if (error) {
+                        console.log(error);
+                        next({
+                            statusCode: 500,
+                            message: 'Internal servor error',
+                        });
+                    } else if (!results.length > 0) {
+                        next({
+                            statusCode: 404,
+                            message: 'Meal does not exist',
+                        });
+                    } else {
+                        results = results.map((meal) => ({
+                            id: meal.id,
+                            name: meal.name,
+                            description: meal.description,
+                            isActive: meal.isActive,
+                            isVega: meal.isVega,
+                            isVegan: meal.isVegan,
+                            isToTakeHome: meal.isToTakeHome,
+                            dateTime: meal.dateTime,
+                            imageUrl: meal.imageUrl,
+                            maxAmountOfParticipants:
+                                meal.maxAmountOfParticipants,
+                            price: meal.price,
+                            allergenes: meal.allergenes.split(','),
+                            cook: {
+                                id: meal.cookId,
+                                firstName: meal.firstName,
+                                lastName: meal.lastName,
+                                street: meal.street,
+                                city: meal.city,
+                                isActive: meal.userIsActive,
+                                emailAdress: meal.emailAdress,
+                                password: meal.password,
+                                phoneNumber: meal.phoneNumber,
+                            },
+                        }));
+
+                        res.status(200).json({
+                            statusCode: 200,
+                            result: results[0],
+                        });
+                    }
+                }
+            );
         });
     },
 
