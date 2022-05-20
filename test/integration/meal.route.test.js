@@ -303,7 +303,7 @@ describe('Manage meals /api/meal/', () => {
                 });
         });
 
-        it('TC-305-4 should return a succes statuscode and message when meal is deleted', (done) => {
+        it('TC-305-5 should return a succes statuscode and message when meal is deleted', (done) => {
             chai.request(server)
                 .delete('/api/meal/1')
                 .set(
