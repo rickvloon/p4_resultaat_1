@@ -33,7 +33,7 @@ describe('Manage meals /api/meal/', () => {
             if (err) throw err;
 
             connection.query(
-                CLEAR_DB + INSERT_USER,
+                CLEAR_DB + INSERT_USER + INSERT_MEALS,
                 function (error, results, fields) {
                     connection.release();
 
@@ -168,6 +168,59 @@ describe('Manage meals /api/meal/', () => {
                             'allergenes',
                             'maxAmountOfParticipants',
                             'price'
+                        );
+
+                    done();
+                });
+        });
+    });
+
+    describe('UC-303 GET all users /api/meal', () => {
+        it('TC-301-1 Should return a valid status code and list of 0 or more meals', (done) => {
+            chai.request(server)
+                .get('/api/meal')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'result');
+
+                    const { result } = res.body;
+
+                    result[0].should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'id',
+                            'name',
+                            'description',
+                            'isActive',
+                            'isVega',
+                            'isVegan',
+                            'isToTakeHome',
+                            'dateTime',
+                            'imageUrl',
+                            'allergenes',
+                            'maxAmountOfParticipants',
+                            'price',
+                            'cook'
+                        );
+
+                    const { cook } = result[0];
+
+                    cook.should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'id',
+                            'firstName',
+                            'lastName',
+                            'street',
+                            'city',
+                            'isActive',
+                            'emailAdress',
+                            'password',
+                            'phoneNumber'
                         );
 
                     done();
