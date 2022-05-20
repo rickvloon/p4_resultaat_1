@@ -1,5 +1,6 @@
 const DBConnection = require('../../database/DBConnection');
 const Joi = require('joi');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     validateMeal: (req, res, next) => {
@@ -81,7 +82,8 @@ module.exports = {
                                 isToTakeHome: meal.isToTakeHome,
                                 dateTime: meal.dateTime,
                                 imageUrl: meal.imageUrl,
-                                maxAmountOfParticipants: meal.maxAmountOfParticipants,
+                                maxAmountOfParticipants:
+                                    meal.maxAmountOfParticipants,
                                 price: meal.price,
                                 allergenes: meal.allergenes.split(','),
                                 cook: {
@@ -93,8 +95,8 @@ module.exports = {
                                     isActive: meal.userIsActive,
                                     emailAdress: meal.emailAdress,
                                     password: meal.password,
-                                    phoneNumber: meal.phoneNumber
-                                }
+                                    phoneNumber: meal.phoneNumber,
+                                },
                             }));
 
                             res.status(200).json({
@@ -125,16 +127,19 @@ module.exports = {
 
         DBConnection.getConnection((err, connection) => {
             if (err) {
-                next({
+                return next({
                     statusCode: 500,
                     message: 'Internal server error',
                 });
-                return;
             }
 
+            const authHeader = req.headers.authorization;
+            const token = authHeader.substring(7, authHeader.length);
+            const decoded = jwt.decode(token);
+
             connection.query(
-                'INSERT INTO `meal` (name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price)' +
-                    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
+                'INSERT INTO `meal` (name, description, isActive, isVega, isVegan, isToTakeHome, dateTime, imageUrl, allergenes, maxAmountOfParticipants, price, cookId)' +
+                    'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);',
                 [
                     name,
                     description,
@@ -147,6 +152,7 @@ module.exports = {
                     allergenes.join(','),
                     maxAmountOfParticipants,
                     price,
+                    decoded.id
                 ],
                 (error, results, fields) => {
                     connection.release();
@@ -157,14 +163,82 @@ module.exports = {
                             message: 'Internal servor error',
                         });
                     } else {
+                        console.log(results.insertId);
                         res.status(200).json({
                             statusCode: 200,
                             result: {
-                                id: results.insertId,
                                 ...req.body,
+                                id: results.insertId,
                             },
                         });
                     }
+                }
+            );
+        });
+    },
+
+    deleteMeal: (req, res, next) => {
+        DBConnection.getConnection((err, connection) => {
+            if (err) {
+                next({
+                    statusCode: 500,
+                    message: 'Internal servor error',
+                });
+                return;
+            }
+
+            connection.query(
+                'SELECT cookId from `meal` WHERE id = ?',
+                req.params.id,
+                (error, results, fields) => {
+                    if (error) {
+                        connection.release();
+                        return next({
+                            statusCode: 500,
+                            result: 'Internal servor error',
+                        });
+                    }
+
+                    const authHeader = req.headers.authorization;
+                    const token = authHeader.substring(7, authHeader.length);
+                    const decoded = jwt.decode(token);
+
+                    if (!results.length > 0) {
+                        connection.release();
+                        return next({
+                            statusCode: 404,
+                            message: 'Meal does not exist',
+                        });
+                    }
+
+                    if (decoded.id != results[0].cookId) {
+                        connection.release();
+                        return next({
+                            statusCode: 403,
+                            message: 'Unauthorized',
+                        });
+                    }
+
+                    connection.query(
+                        'DELETE FROM `meal` WHERE id = ?;',
+                        req.params.id,
+                        (error, results, fields) => {
+                            connection.release();
+                            if (error) {
+                                connection.release();
+                                return next({
+                                    statusCode: 500,
+                                    message: 'Internal servor error',
+                                });
+                            }
+
+                            connection.release();
+                            res.status(200).json({
+                                statusCode: 200,
+                                message: 'Meal deleted',
+                            });
+                        }
+                    );
                 }
             );
         });

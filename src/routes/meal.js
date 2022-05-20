@@ -8,4 +8,6 @@ router.get('/', mealController.getAllMeals);
 
 router.post('/', mealController.validateMeal, authController.validateToken, mealController.createMeal);
 
+router.delete('/:id', authController.validateToken, mealController.deleteMeal);
+
 module.exports = router;
