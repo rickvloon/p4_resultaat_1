@@ -228,6 +228,81 @@ describe('Manage meals /api/meal/', () => {
         });
     });
 
+    describe('UC-304 get meal /api/meal', () => {
+        it('TC-304-1 should return statuscode and error message when meal does not exist', (done) => {
+            chai.request(server)
+                .get('/api/meal/99')
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(404);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Meal does not exist');
+
+                    done();
+                });
+        });
+
+        it('TC-304-2 should return a valid status code and meal object when succesfully requested', (done) => {
+            chai.request(server)
+                .get('/api/meal/1')
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'result');
+
+                    const { result } = res.body;
+
+                    result.should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'id',
+                            'name',
+                            'description',
+                            'isActive',
+                            'isVega',
+                            'isVegan',
+                            'isToTakeHome',
+                            'dateTime',
+                            'imageUrl',
+                            'allergenes',
+                            'maxAmountOfParticipants',
+                            'price',
+                            'cook'
+                        );
+
+                    result.id.should.equal(1);
+
+                    result.cook.should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'id',
+                            'firstName',
+                            'lastName',
+                            'street',
+                            'city',
+                            'isActive',
+                            'emailAdress',
+                            'password',
+                            'phoneNumber'
+                        );
+
+                    done();
+                });
+        });
+    });
+
     describe('UC-305 delete meal /api/meal', () => {
         it('TC-305-2 should return statuscode an error message when user is not signed in', (done) => {
             chai.request(server)
