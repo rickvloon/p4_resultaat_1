@@ -227,4 +227,106 @@ describe('Manage meals /api/meal/', () => {
                 });
         });
     });
+
+    describe('UC-305 delete meal /api/meal', () => {
+        it('TC-305-2 should return statuscode an error message when user is not signed in', (done) => {
+            chai.request(server)
+                .delete('/api/meal/1')
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(401);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Unauthorized');
+
+                    done();
+                });
+        });
+
+        it('TC-305-3 should return statuscode an error message when meal does not belong to the signed in user', (done) => {
+            chai.request(server)
+                .delete('/api/meal/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 2 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(403);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('You are not the owner of this meal');
+
+                    done();
+                });
+        });
+
+        it('TC-305-4 should return statuscode an error message when meal does not exist', (done) => {
+            chai.request(server)
+                .delete('/api/meal/999')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 2 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(404);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Meal does not exist');
+
+                    done();
+                });
+        });
+
+        it('TC-305-4 should return a succes statuscode and message when meal is deleted', (done) => {
+            chai.request(server)
+                .delete('/api/meal/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Meal deleted');
+
+                    done();
+                });
+        });
+    });
 });

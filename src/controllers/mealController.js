@@ -152,7 +152,7 @@ module.exports = {
                     allergenes.join(','),
                     maxAmountOfParticipants,
                     price,
-                    decoded.id
+                    decoded.id,
                 ],
                 (error, results, fields) => {
                     connection.release();
@@ -163,7 +163,6 @@ module.exports = {
                             message: 'Internal servor error',
                         });
                     } else {
-                        console.log(results.insertId);
                         res.status(200).json({
                             statusCode: 200,
                             result: {
@@ -215,7 +214,7 @@ module.exports = {
                         connection.release();
                         return next({
                             statusCode: 403,
-                            message: 'Unauthorized',
+                            message: 'You are not the owner of this meal',
                         });
                     }
 
