@@ -18,7 +18,7 @@ const CLEAR_DB =
 
 const INSERT_USER =
     'INSERT INTO `user` (`id`, `firstName`, `lastName`, `emailAdress`, `password`, `street`, `city` ) VALUES' +
-    '(1, "first", "last", "name@server.nl", "12345678A", "street", "city"),' +
+    '(1, "first", "last", "name@server.nl", "$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a", "street", "city"),' +
     '(2, "first", "last", "second@server.nl", "12345678A", "street", "city");';
 
 const INSERT_MEALS =
@@ -27,7 +27,7 @@ const INSERT_MEALS =
     "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);";
 
 describe('Authentication /api/auth/', () => {
-    describe('UC-201 add user /api/user', () => {
+    describe('UC-101 login /api/auth/login', () => {
         beforeEach((done) => {
             DBConnection.getConnection(function (err, connection) {
                 if (err) throw err;
@@ -148,7 +148,7 @@ describe('Authentication /api/auth/', () => {
                 });
         });
 
-        it('TC-201-5 should return a valid statusCode and user details and token when succesfully registered', (done) => {
+        it('TC-201-5 should return a valid statusCode and user details and token when succesfully signed in', (done) => {
             chai.request(server)
                 .post('/api/auth/login')
                 .send({

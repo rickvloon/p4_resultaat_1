@@ -152,7 +152,7 @@ describe('Manage users /api/user', () => {
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
                     emailAdress: 'name@server.nl',
-                    password: '123',
+                    password: '12345678A',
                     isActive: true,
                     phoneNumber: '12345678',
                 })
@@ -184,7 +184,7 @@ describe('Manage users /api/user', () => {
                     street: 'Lovensdijkstraat 61',
                     city: 'Breda',
                     emailAdress: 'rick@gmail.com',
-                    password: '123',
+                    password: '12345678A',
                     isActive: true,
                     phoneNumber: '12345678',
                 })

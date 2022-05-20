@@ -1,6 +1,7 @@
 const DBConnection = require('../../database/DBConnection');
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 module.exports = {
     validateUser: (req, res, next) => {
@@ -110,7 +111,7 @@ module.exports = {
         });
     },
 
-    createUser: (req, res, next) => {
+    createUser: async (req, res, next) => {
         DBConnection.getConnection((err, connection) => {
             if (err) {
                 next({
@@ -138,35 +139,44 @@ module.exports = {
                             message: 'User is already registered.',
                         });
                     } else {
-                        connection.query(
-                            'INSERT INTO `user` (firstName, lastName, street, city, emailAdress, password) VALUES (?, ?, ?, ?, ?, ?);',
-                            [
-                                firstName,
-                                lastName,
-                                street,
-                                city,
-                                emailAdress,
-                                password,
-                            ],
-                            (error, results, fields) => {
-                                connection.release();
-
-                                if (error) {
-                                    next({
-                                        statusCode: 500,
-                                        message: 'Internal servor error',
-                                    });
-                                } else {
-                                    res.status(201).json({
-                                        statusCode: 201,
-                                        result: {
-                                            id: results.insertId,
-                                            ...req.body,
-                                        },
-                                    });
-                                }
+                        bcrypt.hash(password, 10, (err, hash) => {
+                            if (err) {
+                                return next({
+                                    statusCode: 500,
+                                    message: 'Internal server error',
+                                });
                             }
-                        );
+
+                            connection.query(
+                                'INSERT INTO `user` (firstName, lastName, street, city, emailAdress, password) VALUES (?, ?, ?, ?, ?, ?);',
+                                [
+                                    firstName,
+                                    lastName,
+                                    street,
+                                    city,
+                                    emailAdress,
+                                    hash,
+                                ],
+                                (error, results, fields) => {
+                                    connection.release();
+
+                                    if (error) {
+                                        next({
+                                            statusCode: 500,
+                                            message: 'Internal servor error',
+                                        });
+                                    } else {
+                                        res.status(201).json({
+                                            statusCode: 201,
+                                            result: {
+                                                id: results.insertId,
+                                                ...req.body,
+                                            },
+                                        });
+                                    }
+                                }
+                            );
+                        });
                     }
                 }
             );
@@ -180,11 +190,10 @@ module.exports = {
 
         DBConnection.getConnection((err, connection) => {
             if (err) {
-                next({
+                return next({
                     statusCode: 500,
                     message: 'Internal server error',
                 });
-                return;
             }
 
             connection.query(
