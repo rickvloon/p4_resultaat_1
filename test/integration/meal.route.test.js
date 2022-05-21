@@ -7,6 +7,7 @@ const server = require('../../src/index');
 require('dotenv').config();
 const DBConnection = require('../../database/DBConnection');
 const jwt = require('jsonwebtoken');
+const { expect } = require('chai');
 
 chai.should();
 chai.use(chaiHttp);
@@ -175,8 +176,233 @@ describe('Manage meals /api/meal/', () => {
         });
     });
 
-    describe('UC-303 GET all users /api/meal', () => {
-        it('TC-301-1 Should return a valid status code and list of 0 or more meals', (done) => {
+    describe('UC-302 update meal /api/api/meal', () => {
+        it('TC-302-1 should return an error status code and message when required field is missing', (done) => {
+            chai.request(server)
+                .put('/api/meal/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .send({
+                    description: 'Dé pastaklassieker bij uitstek.',
+                    isActive: true,
+                    isVega: true,
+                    isVegan: true,
+                    isToTakeHome: true,
+                    dateTime: '2022-05-20T08:30:53.232Z',
+                    imageUrl:
+                        'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
+                    allergenes: ['gluten', 'noten', 'lactose'],
+                    maxAmountOfParticipants: 6,
+                    price: 6.75,
+                })
+                .end((err, res) => {
+                    res.should.have.status(400);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('name is a required field');
+
+                    done();
+                });
+        });
+
+        it('TC-302-2 should return an error status code and message when user is not signed in', (done) => {
+            chai.request(server)
+                .put('/api/meal/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, 'somerandomkey')
+                )
+                .send({
+                    name: 'Spaghetti met gehaktballen',
+                    description: 'Dé pastaklassieker bij uitstek.',
+                    isActive: true,
+                    isVega: true,
+                    isVegan: true,
+                    isToTakeHome: true,
+                    dateTime: '2022-05-20T08:30:53.232Z',
+                    imageUrl:
+                        'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
+                    allergenes: ['gluten', 'noten', 'lactose'],
+                    maxAmountOfParticipants: 6,
+                    price: 6.75,
+                })
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Unauthorized');
+
+                    done();
+                });
+        });
+
+        it('TC-302-3 should return an error status code and message when user does not own this meal', (done) => {
+            chai.request(server)
+                .put('/api/meal/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 2 }, process.env.JWT_SECRET)
+                )
+                .send({
+                    name: 'Spaghetti met gehaktballen',
+                    description: 'Dé pastaklassieker bij uitstek.',
+                    isActive: true,
+                    isVega: true,
+                    isVegan: true,
+                    isToTakeHome: true,
+                    dateTime: '2022-05-20T08:30:53.232Z',
+                    imageUrl:
+                        'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
+                    allergenes: ['gluten', 'noten', 'lactose'],
+                    maxAmountOfParticipants: 6,
+                    price: 6.75,
+                })
+                .end((err, res) => {
+                    res.should.have.status(403);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('You are not the owner of this meal');
+
+                    done();
+                });
+        });
+
+        it('TC-302-4 should return an error status code and message when the meal does not exist', (done) => {
+            chai.request(server)
+                .put('/api/meal/999')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .send({
+                    name: 'Spaghetti met gehaktballen',
+                    description: 'Dé pastaklassieker bij uitstek.',
+                    isActive: true,
+                    isVega: true,
+                    isVegan: true,
+                    isToTakeHome: true,
+                    dateTime: '2022-05-20T08:30:53.232Z',
+                    imageUrl:
+                        'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
+                    allergenes: ['gluten', 'noten', 'lactose'],
+                    maxAmountOfParticipants: 6,
+                    price: 6.75,
+                })
+                .end((err, res) => {
+                    res.should.have.status(404);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Meal does not exist');
+
+                    done();
+                });
+        });
+
+        it('TC-302-5 should return a status code and the meal object when meal is updated', (done) => {
+            chai.request(server)
+                .put('/api/meal/1')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .send({
+                    name: 'Updated spaghetti',
+                    description: 'Dé pastaklassieker bij uitstek.',
+                    isActive: true,
+                    isVega: true,
+                    isVegan: true,
+                    isToTakeHome: true,
+                    dateTime: '2022-05-20T08:30:53.232Z',
+                    imageUrl:
+                        'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
+                    allergenes: ['gluten', 'noten', 'lactose'],
+                    maxAmountOfParticipants: 6,
+                    price: 6.75,
+                })
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.keys('statusCode', 'result');
+
+                    const { statusCode, result } = res.body;
+
+                    statusCode.should.be.an('number');
+
+                    expect(result).to.deep.equal({
+                        id: 1,
+                        name: 'Updated spaghetti',
+                        description: 'Dé pastaklassieker bij uitstek.',
+                        isActive: true,
+                        isVega: true,
+                        isVegan: true,
+                        isToTakeHome: true,
+                        maxAmountOfParticipants: 6,
+                        dateTime: '2022-05-20T06:30:53.000Z',
+                        price: 6.75,
+                        imageUrl:
+                            'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
+                        allergenes: ['gluten', 'lactose', 'noten'],
+                        cook: {
+                            id: 1,
+                            firstName: 'first',
+                            lastName: 'last',
+                            street: 'street',
+                            city: 'city',
+                            isActive: true,
+                            emailAdress: 'name@server.nl',
+                            password: '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
+                            phoneNumber: '-',
+                        },
+                    });
+
+                    done();
+                });
+        });
+    });
+
+    describe('UC-303 GET all meals /api/meal', () => {
+        it('TC-301-1 should return a valid status code and list of 0 or more meals', (done) => {
             chai.request(server)
                 .get('/api/meal')
                 .end((err, res) => {
