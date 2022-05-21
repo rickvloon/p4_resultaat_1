@@ -16,10 +16,14 @@ module.exports = {
                     'string.pattern.base': 'password must be a valid password',
                 }),
             emailAdress: Joi.string()
+                .email({
+                    tlds: { allow: ['com', 'net', 'eu', 'nl'] },
+                })
                 .required()
                 .messages({
                     'string.base': 'emailAdress should be a string',
                     'any.required': 'emailAdress is a required field',
+                    'string.email': 'emailAdress must be a valid email',
                 }),
         });
 
@@ -28,7 +32,7 @@ module.exports = {
         if (error) {
             next({
                 statusCode: 400,
-                message: error.message,
+                message: error.message
             });
         } else {
             next();
