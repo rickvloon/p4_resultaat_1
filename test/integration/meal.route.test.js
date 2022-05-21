@@ -378,7 +378,7 @@ describe('Manage meals /api/meal/', () => {
                         isVegan: true,
                         isToTakeHome: true,
                         maxAmountOfParticipants: 6,
-                        dateTime: '2022-05-12T10:15:11.000Z',
+                        dateTime: '2022-05-12T08:15:11.000Z',
                         price: 6.75,
                         imageUrl:
                             'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
