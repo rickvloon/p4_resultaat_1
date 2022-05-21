@@ -274,6 +274,7 @@ module.exports = {
                     connection.release();
 
                     if (error) {
+                        console.log(error);
                         next({
                             statusCode: 500,
                             message: 'Internal servor error',
@@ -308,6 +309,7 @@ module.exports = {
                 (error, results, fields) => {
                     if (error) {
                         connection.release();
+                        console.log(error);
                         return next({
                             statusCode: 500,
                             result: 'Internal servor error',
@@ -352,7 +354,7 @@ module.exports = {
                         [...values, req.params.id],
                         (error, results, fields) => {
                             connection.release();
-
+                            console.log(error);
                             if (error) {
                                 connection.release();
                                 return next({
