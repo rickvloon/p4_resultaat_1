@@ -11,7 +11,58 @@ module.exports = {
                 'any.required': 'name is a required field',
             }),
             description: Joi.string().required().messages({
-                'any.required': 'description is a required field',
+                'base.string': 'description is a required field',
+            }),
+            isActive: Joi.boolean().messages({
+                'base.boolean': 'isActive should be a boolean',
+            }),
+            isVega: Joi.boolean().messages({
+                'base.boolean': 'isVega should be a boolean',
+            }),
+            isVegan: Joi.boolean().messages({
+                'base.boolean': 'isVegan should be a boolean',
+            }),
+            isToTakeHome: Joi.boolean().messages({
+                'base.boolean': 'isToTakeHome should be a boolean',
+            }),
+            dateTime: Joi.string().messages({
+                'base.string': 'dateTime should be a string',
+            }),
+            imageUrl: Joi.string().messages({
+                'base.string': 'imageUrl should be a string',
+            }),
+            allergenes: Joi.array().items(Joi.string()).required().messages({
+                'base.array': 'allergenes should be an array of strings',
+            }),
+            maxAmountOfParticipants: Joi.number().required().messages({
+                'any.required': 'maxAmountOfParticipants is a required field',
+            }),
+            price: Joi.number().required().messages({
+                'any.required': 'price is a required field',
+            }),
+        });
+
+        const { error } = schema.validate(meal);
+
+        if (error) {
+            next({
+                statusCode: 400,
+                message: error.message,
+            });
+        } else {
+            next();
+        }
+    },
+
+    validateUpdatedMeal: (req, res, next) => {
+        const meal = req.body;
+
+        const schema = Joi.object({
+            name: Joi.string().required().messages({
+                'any.required': 'name is a required field',
+            }),
+            description: Joi.string().messages({
+                'base.string': 'description should be a string',
             }),
             isActive: Joi.boolean().required().messages({
                 'any.required': 'isActive is a required field',
@@ -142,15 +193,15 @@ module.exports = {
                             id: meal.id,
                             name: meal.name,
                             description: meal.description,
-                            isActive: meal.isActive,
-                            isVega: meal.isVega,
-                            isVegan: meal.isVegan,
-                            isToTakeHome: meal.isToTakeHome,
+                            isActive: Boolean(meal.isActive),
+                            isVega: Boolean(meal.isVega),
+                            isVegan: Boolean(meal.isVegan),
+                            isToTakeHome: Boolean(meal.isToTakeHome),
                             dateTime: meal.dateTime,
                             imageUrl: meal.imageUrl,
                             maxAmountOfParticipants:
                                 meal.maxAmountOfParticipants,
-                            price: meal.price,
+                            price: Number(meal.price),
                             allergenes: meal.allergenes.split(','),
                             cook: {
                                 id: meal.cookId,
@@ -158,7 +209,7 @@ module.exports = {
                                 lastName: meal.lastName,
                                 street: meal.street,
                                 city: meal.city,
-                                isActive: meal.userIsActive,
+                                isActive: Boolean(meal.userIsActive),
                                 emailAdress: meal.emailAdress,
                                 password: meal.password,
                                 phoneNumber: meal.phoneNumber,
