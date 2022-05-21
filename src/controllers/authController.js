@@ -1,6 +1,7 @@
 const DBConnection = require('../../database/DBConnection');
 const Joi = require('joi');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 require('dotenv').config();
 
 module.exports = {
@@ -59,7 +60,6 @@ module.exports = {
                 }
 
                 if (payload) {
-                    req.body.id = payload.id;
                     next();
                 }
             });
@@ -97,34 +97,48 @@ module.exports = {
                     } else {
                         const user = results[0];
 
-                        if (user.password === password) {
-                            jwt.sign(
-                                { id: user.id },
-                                process.env.JWT_SECRET,
-                                { expiresIn: '7d' },
-                                (error, token) => {
-                                    if (error) {
-                                        next({
-                                            statusCode: 500,
-                                            message: 'Internal server error.',
-                                        });
-                                    }
-
-                                    res.status(200).json({
-                                        statusCode: 200,
-                                        result: {
-                                            ...results[0],
-                                            token
-                                        },
+                        bcrypt.compare(
+                            password,
+                            user.password,
+                            (err, result) => {
+                                if (err) {
+                                    return next({
+                                        statusCode: 500,
+                                        message: 'Internal server error.',
                                     });
                                 }
-                            );
-                        } else {
-                            next({
-                                statusCode: 400,
-                                message: 'Invalid credentials.',
-                            });
-                        }
+
+                                if (result) {
+                                    jwt.sign(
+                                        { id: user.id },
+                                        process.env.JWT_SECRET,
+                                        { expiresIn: '7d' },
+                                        (error, token) => {
+                                            if (error) {
+                                                return next({
+                                                    statusCode: 500,
+                                                    message:
+                                                        'Internal server error.',
+                                                });
+                                            }
+
+                                            res.status(200).json({
+                                                statusCode: 200,
+                                                result: {
+                                                    ...results[0],
+                                                    token,
+                                                },
+                                            });
+                                        }
+                                    );
+                                } else {
+                                    next({
+                                        statusCode: 400,
+                                        message: 'Invalid credentials.',
+                                    });
+                                }
+                            }
+                        );
                     }
                 }
             );

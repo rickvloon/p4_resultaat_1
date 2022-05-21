@@ -1,5 +1,6 @@
 const express = require('express');
-const usersRouter = require('./routes/users');
+const usersRouter = require('./routes/user');
+const mealRouter = require('./routes/meal');
 const authRouter = require('./routes/authentication');
 require('dotenv').config();
 
@@ -10,6 +11,7 @@ app.use(express.json());
 
 app.use('/api/user', usersRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/meal', mealRouter);
 
 app.use('*', (req, res) => {
     res.status(401).json({
