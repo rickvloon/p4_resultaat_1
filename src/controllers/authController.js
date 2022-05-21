@@ -91,7 +91,7 @@ module.exports = {
                         });
                     } else if (results && !results.length > 0) {
                         next({
-                            statusCode: 400,
+                            statusCode: 404,
                             message: 'User does not exist.',
                         });
                     } else {
@@ -121,6 +121,8 @@ module.exports = {
                                                         'Internal server error.',
                                                 });
                                             }
+
+                                            results[0].isActive = Boolean(results[0].isActive);
 
                                             res.status(200).json({
                                                 statusCode: 200,

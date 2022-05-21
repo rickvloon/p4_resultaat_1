@@ -70,7 +70,7 @@ describe('Authentication /api/auth/', () => {
                 });
         });
 
-        it('TC-201-2 should return a valid error when emailAdress is invalid', (done) => {
+        it('TC-101-2 should return a valid error when emailAdress is invalid', (done) => {
             chai.request(server)
                 .post('/api/auth/login')
                 .send({
@@ -96,7 +96,7 @@ describe('Authentication /api/auth/', () => {
                 });
         });
 
-        it('TC-201-3 should return a valid error when password is invalid', (done) => {
+        it('TC-101-3 should return a valid error when password is invalid', (done) => {
             chai.request(server)
                 .post('/api/auth/login')
                 .send({
@@ -122,7 +122,7 @@ describe('Authentication /api/auth/', () => {
                 });
         });
 
-        it('TC-201-4 should return a valid status and error message when user is not registered', (done) => {
+        it('TC-101-4 should return a valid status and error message when user is not registered', (done) => {
             chai.request(server)
                 .post('/api/auth/login')
                 .send({
@@ -131,7 +131,7 @@ describe('Authentication /api/auth/', () => {
                 })
                 .end((err, res) => {
                     assert.ifError(err);
-                    res.should.have.status(400);
+                    res.should.have.status(404);
                     res.should.be.an('object');
 
                     res.body.should.be
