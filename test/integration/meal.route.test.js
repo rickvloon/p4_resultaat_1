@@ -28,13 +28,18 @@ const INSERT_MEALS =
     "(1, 'Meal A', 'description', 'image url', NOW(), 5, 6.50, 1)," +
     "(2, 'Meal B', 'description', 'image url', NOW(), 5, 6.50, 1);";
 
+const INSERT_PARTICIPANTS =
+    'INSERT INTO `meal_participants_user` (`mealId`, `userId`) VALUES' +
+    "(1,1), (1,2), (2,2);";
+
+
 describe('Manage meals /api/meal/', () => {
     beforeEach((done) => {
         DBConnection.getConnection(function (err, connection) {
             if (err) throw err;
 
             connection.query(
-                CLEAR_DB + INSERT_USER + INSERT_MEALS,
+                CLEAR_DB + INSERT_USER + INSERT_MEALS + INSERT_PARTICIPANTS,
                 function (error, results, fields) {
                     connection.release();
 
@@ -505,6 +510,7 @@ describe('Manage meals /api/meal/', () => {
                             'allergenes',
                             'maxAmountOfParticipants',
                             'price',
+                            'participants',
                             'cook'
                         );
 

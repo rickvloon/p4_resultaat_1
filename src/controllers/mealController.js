@@ -172,13 +172,12 @@ module.exports = {
             }
 
             connection.query(
-                'SELECT meal.id, name, description, meal.isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, allergenes, cookId, firstName, lastName, street, city, user.isActive as userIsActive, emailAdress, password, phoneNumber FROM `meal` INNER JOIN `user` ON cookId = user.id WHERE meal.id = ?',
+                'SELECT meal.id, name, mealId, user.id as userId, description, meal.isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, allergenes, cookId, firstName, lastName, street, city, user.isActive as userIsActive, emailAdress, password, phoneNumber FROM `meal` LEFT JOIN meal_participants_user ON mealId = meal.id LEFT JOIN user ON userId = user.id WHERE meal.id = ?',
                 req.params.id,
                 (error, results, fields) => {
                     connection.release();
 
                     if (error) {
-                        console.log(error);
                         next({
                             statusCode: 500,
                             message: 'Internal servor error',
@@ -189,36 +188,43 @@ module.exports = {
                             message: 'Meal does not exist',
                         });
                     } else {
-                        results = results.map((meal) => ({
-                            id: meal.id,
-                            name: meal.name,
-                            description: meal.description,
-                            isActive: Boolean(meal.isActive),
-                            isVega: Boolean(meal.isVega),
-                            isVegan: Boolean(meal.isVegan),
-                            isToTakeHome: Boolean(meal.isToTakeHome),
-                            dateTime: meal.dateTime,
-                            imageUrl: meal.imageUrl,
+                        const meals = {
+                            id: results[0].id,
+                            name: results[0].name,
+                            description: results[0].description,
+                            isActive: Boolean(results[0].isActive),
+                            isVega: Boolean(results[0].isVega),
+                            isVegan: Boolean(results[0].isVegan),
+                            isToTakeHome: Boolean(results[0].isToTakeHome),
+                            dateTime: results[0].dateTime,
+                            imageUrl: results[0].imageUrl,
                             maxAmountOfParticipants:
-                                meal.maxAmountOfParticipants,
-                            price: Number(meal.price),
-                            allergenes: meal.allergenes.split(','),
-                            cook: {
-                                id: meal.cookId,
-                                firstName: meal.firstName,
-                                lastName: meal.lastName,
-                                street: meal.street,
-                                city: meal.city,
-                                isActive: Boolean(meal.userIsActive),
-                                emailAdress: meal.emailAdress,
-                                password: meal.password,
-                                phoneNumber: meal.phoneNumber,
-                            },
-                        }));
+                                results[0].maxAmountOfParticipants,
+                            price: Number(results[0].price),
+                            allergenes: results[0].allergenes.split(','),
+                            cook: {},
+                            participants: [],
+                        };
+
+                        if (results[0].mealId) {
+                            meals.participants = results.map((user) => ({
+                                id: user.userId,
+                                firstName: user.firstName,
+                                lastName: user.lastName,
+                                street: user.street,
+                                city: user.city,
+                                isActive: user.userIsActive,
+                                emailAdress: user.emailAdress,
+                                password: user.password,
+                                phoneNumber: user.phoneNumber,
+                            }));
+                        }
+
+                        meals.cook = meals.participants.find((user) => user.id === results[0].cookId) ?? {};
 
                         res.status(200).json({
                             statusCode: 200,
-                            result: results[0],
+                            result: meals,
                         });
                     }
                 }
@@ -274,7 +280,6 @@ module.exports = {
                     connection.release();
 
                     if (error) {
-                        console.log(error);
                         next({
                             statusCode: 500,
                             message: 'Internal servor error',
@@ -309,7 +314,6 @@ module.exports = {
                 (error, results, fields) => {
                     if (error) {
                         connection.release();
-                        console.log(error);
                         return next({
                             statusCode: 500,
                             result: 'Internal servor error',
@@ -354,7 +358,6 @@ module.exports = {
                         [...values, req.params.id],
                         (error, results, fields) => {
                             connection.release();
-                            console.log(error);
                             if (error) {
                                 connection.release();
                                 return next({
