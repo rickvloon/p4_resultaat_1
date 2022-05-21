@@ -780,7 +780,7 @@ describe('Manage users /api/user', () => {
                     'Bearer ' + jwt.sign({ id: 999 }, process.env.JWT_SECRET)
                 )
                 .end((err, res) => {
-                    res.should.have.status(400);
+                    res.should.have.status(401);
                     res.should.be.an('object');
 
                     res.body.should.be
@@ -806,7 +806,7 @@ describe('Manage users /api/user', () => {
                     'Bearer ' + jwt.sign({ id: 2 }, process.env.JWT_SECRET)
                 )
                 .end((err, res) => {
-                    res.should.have.status(401);
+                    res.should.have.status(403);
                     res.should.be.an('object');
 
                     res.body.should.be

@@ -369,7 +369,7 @@ module.exports = {
 
         if (decoded.id != req.params.id) {
             return next({
-                statusCode: 401,
+                statusCode: 403,
                 message: 'Unauthorized',
             });
         }
@@ -394,7 +394,7 @@ module.exports = {
                         });
                     } else if (!results.affectedRows > 0) {
                         next({
-                            statusCode: 400,
+                            statusCode: 401,
                             message: 'User does not exist',
                         });
                     } else {
