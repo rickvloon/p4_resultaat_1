@@ -135,7 +135,7 @@ module.exports = {
                                     );
                                 } else {
                                     next({
-                                        statusCode: 400,
+                                        statusCode: 404,
                                         message: 'Invalid credentials.',
                                     });
                                 }
