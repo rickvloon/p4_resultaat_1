@@ -37,8 +37,8 @@ module.exports = {
             }),
             emailAdress: Joi.string()
                 .email({
-                    minDomainSegments: 2,
-                    tlds: { allow: ['com', 'net', 'eu', 'nl'] },
+                    minDomainSegments: 1,
+                    tlds: { allow: ['nl'] },
                 })
                 .required()
                 .messages({
