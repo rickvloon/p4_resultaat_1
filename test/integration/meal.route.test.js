@@ -136,7 +136,7 @@ describe('Manage meals /api/meal/', () => {
                     isVega: true,
                     isVegan: true,
                     isToTakeHome: true,
-                    dateTime: '2022-05-20T08:30:53.232Z',
+                    dateTime: '2022-05-12 10:15:11',
                     imageUrl:
                         'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
                     allergenes: ['gluten', 'noten', 'lactose'],
@@ -270,7 +270,7 @@ describe('Manage meals /api/meal/', () => {
                     isVega: true,
                     isVegan: true,
                     isToTakeHome: true,
-                    dateTime: '2022-05-20T08:30:53.232Z',
+                    dateTime: '2022-05-12 10:15:11',
                     imageUrl:
                         'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
                     allergenes: ['gluten', 'noten', 'lactose'],
@@ -310,7 +310,7 @@ describe('Manage meals /api/meal/', () => {
                     isVega: true,
                     isVegan: true,
                     isToTakeHome: true,
-                    dateTime: '2022-05-20T08:30:53.232Z',
+                    dateTime: '2022-05-12 10:15:11',
                     imageUrl:
                         'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
                     allergenes: ['gluten', 'noten', 'lactose'],
