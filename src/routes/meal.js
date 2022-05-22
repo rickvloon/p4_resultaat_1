@@ -8,6 +8,8 @@ router.get('/', mealController.getAllMeals);
 
 router.get('/:id', mealController.getMeal);
 
+router.get('/:id/participate', authController.validateToken, mealController.participateMeal);
+
 router.post('/', mealController.validateMeal, authController.validateToken, mealController.createMeal);
 
 router.put('/:id', mealController.validateUpdatedMeal, authController.validateToken, mealController.updateMeal, mealController.getMeal);
