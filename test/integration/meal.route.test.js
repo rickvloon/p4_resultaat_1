@@ -342,7 +342,7 @@ describe('Manage meals /api/meal/', () => {
                 });
         });
 
-        xit('TC-302-5 should return a status code and the meal object when meal is updated', (done) => {
+        it('TC-302-5 should return a status code and the meal object when meal is updated', (done) => {
             chai.request(server)
                 .put('/api/meal/1')
                 .set(
@@ -375,33 +375,59 @@ describe('Manage meals /api/meal/', () => {
 
                     statusCode.should.be.an('number');
 
-                    expect(result).to.deep.equal({
-                        id: 1,
-                        name: 'Updated spaghetti',
-                        description: 'Dé pastaklassieker bij uitstek.',
-                        isActive: true,
-                        isVega: true,
-                        isVegan: true,
-                        isToTakeHome: true,
-                        maxAmountOfParticipants: 6,
-                        dateTime: '2022-05-12T08:15:11.000Z',
-                        price: 6.75,
-                        imageUrl:
-                            'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
-                        allergenes: ['gluten', 'lactose', 'noten'],
-                        cook: {
+                    expect(result)
+                        .excluding('dateTime')
+                        .to.deep.equal({
                             id: 1,
-                            firstName: 'first',
-                            lastName: 'last',
-                            street: 'street',
-                            city: 'city',
+                            name: 'Updated spaghetti',
+                            description: 'Dé pastaklassieker bij uitstek.',
                             isActive: true,
-                            emailAdress: 'name@server.nl',
-                            password:
-                                '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
-                            phoneNumber: '-',
-                        },
-                    });
+                            isVega: true,
+                            isVegan: true,
+                            isToTakeHome: true,
+                            maxAmountOfParticipants: 6,
+                            price: 6.75,
+                            imageUrl:
+                                'https://miljuschka.nl/wp-content/uploads/2021/02/Pasta-bolognese-3-2.jpg',
+                            allergenes: ['gluten', 'lactose', 'noten'],
+                            cook: {
+                                id: 1,
+                                firstName: 'first',
+                                lastName: 'last',
+                                street: 'street',
+                                city: 'city',
+                                isActive: true,
+                                emailAdress: 'name@server.nl',
+                                password:
+                                    '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
+                                phoneNumber: '-',
+                            },
+                            participants: [
+                                {
+                                    id: 1,
+                                    firstName: 'first',
+                                    lastName: 'last',
+                                    street: 'street',
+                                    city: 'city',
+                                    isActive: true,
+                                    emailAdress: 'name@server.nl',
+                                    password:
+                                        '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
+                                    phoneNumber: '-',
+                                },
+                                {
+                                    id: 2,
+                                    firstName: 'first',
+                                    lastName: 'last',
+                                    street: 'street',
+                                    city: 'city',
+                                    isActive: true,
+                                    emailAdress: 'second@server.nl',
+                                    password: '12345678A',
+                                    phoneNumber: '-',
+                                },
+                            ],
+                        });
 
                     done();
                 });
@@ -441,32 +467,21 @@ describe('Manage meals /api/meal/', () => {
                             'participants'
                         );
 
-                    expect(result[0]).excluding('dateTime').to.deep.equal({
-                        id: 1,
-                        name: 'Meal A',
-                        description: 'description',
-                        isActive: false,
-                        isVega: false,
-                        isVegan: false,
-                        isToTakeHome: true,
-                        imageUrl: 'image url',
-                        maxAmountOfParticipants: 5,
-                        price: 6.5,
-                        allergenes: [''],
-                        cook: {
+                    expect(result[0])
+                        .excluding('dateTime')
+                        .to.deep.equal({
                             id: 1,
-                            firstName: 'first',
-                            lastName: 'last',
-                            street: 'street',
-                            city: 'city',
-                            isActive: true,
-                            emailAdress: 'name@server.nl',
-                            password:
-                                '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
-                            phoneNumber: '-',
-                        },
-                        participants: [
-                            {
+                            name: 'Meal A',
+                            description: 'description',
+                            isActive: false,
+                            isVega: false,
+                            isVegan: false,
+                            isToTakeHome: true,
+                            imageUrl: 'image url',
+                            maxAmountOfParticipants: 5,
+                            price: 6.5,
+                            allergenes: [''],
+                            cook: {
                                 id: 1,
                                 firstName: 'first',
                                 lastName: 'last',
@@ -478,19 +493,32 @@ describe('Manage meals /api/meal/', () => {
                                     '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
                                 phoneNumber: '-',
                             },
-                            {
-                                id: 2,
-                                firstName: 'first',
-                                lastName: 'last',
-                                street: 'street',
-                                city: 'city',
-                                isActive: true,
-                                emailAdress: 'second@server.nl',
-                                password: '12345678A',
-                                phoneNumber: '-',
-                            },
-                        ],
-                    });
+                            participants: [
+                                {
+                                    id: 1,
+                                    firstName: 'first',
+                                    lastName: 'last',
+                                    street: 'street',
+                                    city: 'city',
+                                    isActive: true,
+                                    emailAdress: 'name@server.nl',
+                                    password:
+                                        '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
+                                    phoneNumber: '-',
+                                },
+                                {
+                                    id: 2,
+                                    firstName: 'first',
+                                    lastName: 'last',
+                                    street: 'street',
+                                    city: 'city',
+                                    isActive: true,
+                                    emailAdress: 'second@server.nl',
+                                    password: '12345678A',
+                                    phoneNumber: '-',
+                                },
+                            ],
+                        });
 
                     const { cook } = result[0];
 

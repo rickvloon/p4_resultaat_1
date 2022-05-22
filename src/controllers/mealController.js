@@ -242,7 +242,7 @@ module.exports = {
                                 lastName: user.lastName,
                                 street: user.street,
                                 city: user.city,
-                                isActive: user.userIsActive,
+                                isActive: Boolean(user.userIsActive),
                                 emailAdress: user.emailAdress,
                                 password: user.password,
                                 phoneNumber: user.phoneNumber,
