@@ -30,6 +30,7 @@
     "mysql2": "^2.3.3"
   },
   "devDependencies": {
+    "chai-exclude": "^2.1.0",
     "nodemon": "^2.0.15"
   }
 }
