@@ -347,7 +347,7 @@ module.exports = {
                                                     statusCode: 200,
                                                     result: {
                                                         ...req.body,
-                                                        id: decoded.id
+                                                        id: decoded.id,
                                                     },
                                                 });
                                             }
@@ -367,12 +367,6 @@ module.exports = {
         const token = authHeader.substring(7, authHeader.length);
         const decoded = jwt.decode(token);
 
-        if (decoded.id != req.params.id) {
-            return next({
-                statusCode: 403,
-                message: 'Unauthorized',
-            });
-        }
         DBConnection.getConnection((err, connection) => {
             if (err) {
                 next({
@@ -396,6 +390,11 @@ module.exports = {
                         next({
                             statusCode: 400,
                             message: 'User does not exist',
+                        });
+                    } else if (decoded.id != req.params.id) {
+                        next({
+                            statusCode: 403,
+                            message: 'Unauthorized',
                         });
                     } else {
                         res.status(200).json({
