@@ -2,6 +2,7 @@ process.env.DB_DATABASE = process.env.DB_DATABASE || 'share-a-meal-testdb';
 
 const assert = require('assert');
 const chai = require('chai');
+const chaiExclude = require('chai-exclude');
 const chaiHttp = require('chai-http');
 const server = require('../../src/index');
 require('dotenv').config();
@@ -10,6 +11,7 @@ const jwt = require('jsonwebtoken');
 const { expect } = require('chai');
 
 chai.should();
+chai.use(chaiExclude);
 chai.use(chaiHttp);
 
 const CLEAR_MEAL_TABLE = 'DELETE IGNORE FROM `meal`;';
@@ -30,8 +32,7 @@ const INSERT_MEALS =
 
 const INSERT_PARTICIPANTS =
     'INSERT INTO `meal_participants_user` (`mealId`, `userId`) VALUES' +
-    "(1,1), (1,2), (2,2);";
-
+    '(1,1), (1,2), (2,2);';
 
 describe('Manage meals /api/meal/', () => {
     beforeEach((done) => {
@@ -396,7 +397,8 @@ describe('Manage meals /api/meal/', () => {
                             city: 'city',
                             isActive: true,
                             emailAdress: 'name@server.nl',
-                            password: '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
+                            password:
+                                '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
                             phoneNumber: '-',
                         },
                     });
@@ -435,8 +437,60 @@ describe('Manage meals /api/meal/', () => {
                             'allergenes',
                             'maxAmountOfParticipants',
                             'price',
-                            'cook'
+                            'cook',
+                            'participants'
                         );
+
+                    expect(result[0]).excluding('dateTime').to.deep.equal({
+                        id: 1,
+                        name: 'Meal A',
+                        description: 'description',
+                        isActive: false,
+                        isVega: false,
+                        isVegan: false,
+                        isToTakeHome: true,
+                        imageUrl: 'image url',
+                        maxAmountOfParticipants: 5,
+                        price: 6.5,
+                        allergenes: [''],
+                        cook: {
+                            id: 1,
+                            firstName: 'first',
+                            lastName: 'last',
+                            street: 'street',
+                            city: 'city',
+                            isActive: true,
+                            emailAdress: 'name@server.nl',
+                            password:
+                                '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
+                            phoneNumber: '-',
+                        },
+                        participants: [
+                            {
+                                id: 1,
+                                firstName: 'first',
+                                lastName: 'last',
+                                street: 'street',
+                                city: 'city',
+                                isActive: true,
+                                emailAdress: 'name@server.nl',
+                                password:
+                                    '$2a$10$NLEkwpCNTsFFZVRjqPdB4uWB.f7/YsFgHs95PcFjDqz0bjy/mRE5a',
+                                phoneNumber: '-',
+                            },
+                            {
+                                id: 2,
+                                firstName: 'first',
+                                lastName: 'last',
+                                street: 'street',
+                                city: 'city',
+                                isActive: true,
+                                emailAdress: 'second@server.nl',
+                                password: '12345678A',
+                                phoneNumber: '-',
+                            },
+                        ],
+                    });
 
                     const { cook } = result[0];
 

@@ -114,7 +114,7 @@ module.exports = {
                 });
             } else {
                 connection.query(
-                    'SELECT meal.id, name, description, meal.isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, allergenes, cookId, firstName, lastName, street, city, user.isActive as userIsActive, emailAdress, password, phoneNumber FROM `meal` INNER JOIN `user` ON cookId = user.id;',
+                    'SELECT meal.id, name, mealId, user.id as userId, description, meal.isActive, isVega, isVegan, isToTakeHome, dateTime, maxAmountOfParticipants, price, imageUrl, allergenes, cookId, firstName, lastName, street, city, user.isActive as userIsActive, emailAdress, password, phoneNumber FROM `meal` LEFT JOIN meal_participants_user ON mealId = meal.id LEFT JOIN user ON userId = user.id;',
                     (error, results, fields) => {
                         connection.release();
                         if (error) {
@@ -123,36 +123,57 @@ module.exports = {
                                 message: 'Internal servor error',
                             });
                         } else {
-                            results = results.map((meal) => ({
-                                id: meal.id,
-                                name: meal.name,
-                                description: meal.description,
-                                isActive: meal.isActive,
-                                isVega: meal.isVega,
-                                isVegan: meal.isVegan,
-                                isToTakeHome: meal.isToTakeHome,
-                                dateTime: meal.dateTime,
-                                imageUrl: meal.imageUrl,
-                                maxAmountOfParticipants:
-                                    meal.maxAmountOfParticipants,
-                                price: meal.price,
-                                allergenes: meal.allergenes.split(','),
-                                cook: {
-                                    id: meal.cookId,
-                                    firstName: meal.firstName,
-                                    lastName: meal.lastName,
-                                    street: meal.street,
-                                    city: meal.city,
-                                    isActive: meal.userIsActive,
-                                    emailAdress: meal.emailAdress,
-                                    password: meal.password,
-                                    phoneNumber: meal.phoneNumber,
-                                },
-                            }));
+                            const meals = [];
+                            results.forEach((meal_user) => {
+                                if (!(meals.find((meal) => meal.id === meal_user.id))) {
+                                    meals.push({
+                                        id: meal_user.id,
+                                        name: meal_user.name,
+                                        description: meal_user.description,
+                                        isActive: Boolean(meal_user.isActive),
+                                        isVega: Boolean(meal_user.isVega),
+                                        isVegan: Boolean(meal_user.isVegan),
+                                        isToTakeHome: Boolean(meal_user.isToTakeHome),
+                                        dateTime: meal_user.dateTime,
+                                        imageUrl: meal_user.imageUrl,
+                                        maxAmountOfParticipants:
+                                            meal_user.maxAmountOfParticipants,
+                                        price: Number(meal_user.price),
+                                        allergenes:
+                                            meal_user.allergenes.split(','),
+                                        cook: {},
+                                        participants: [],
+                                    });
+                                }
+
+                                if (meal_user.userId != null) {
+                                    const index = meals.findIndex(
+                                        (meal) => meal.id === meal_user.id
+                                    );
+
+                                    const user = {
+                                        id: meal_user.userId,
+                                        firstName: meal_user.firstName,
+                                        lastName: meal_user.lastName,
+                                        street: meal_user.street,
+                                        city: meal_user.city,
+                                        isActive: Boolean(meal_user.userIsActive),
+                                        emailAdress: meal_user.emailAdress,
+                                        password: meal_user.password,
+                                        phoneNumber: meal_user.phoneNumber,
+                                    };
+
+                                    meals[index].participants.push(user);
+
+                                    if (meal_user.cookId === meal_user.userId) {
+                                        meals[index].cook = user;
+                                    }
+                                }
+                            });
 
                             res.status(200).json({
                                 statusCode: 200,
-                                result: results,
+                                result: meals,
                             });
                         }
                     }
@@ -220,7 +241,10 @@ module.exports = {
                             }));
                         }
 
-                        meals.cook = meals.participants.find((user) => user.id === results[0].cookId) ?? {};
+                        meals.cook =
+                            meals.participants.find(
+                                (user) => user.id === results[0].cookId
+                            ) ?? {};
 
                         res.status(200).json({
                             statusCode: 200,
