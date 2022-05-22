@@ -125,7 +125,11 @@ module.exports = {
                         } else {
                             const meals = [];
                             results.forEach((meal_user) => {
-                                if (!(meals.find((meal) => meal.id === meal_user.id))) {
+                                if (
+                                    !meals.find(
+                                        (meal) => meal.id === meal_user.id
+                                    )
+                                ) {
                                     meals.push({
                                         id: meal_user.id,
                                         name: meal_user.name,
@@ -133,7 +137,9 @@ module.exports = {
                                         isActive: Boolean(meal_user.isActive),
                                         isVega: Boolean(meal_user.isVega),
                                         isVegan: Boolean(meal_user.isVegan),
-                                        isToTakeHome: Boolean(meal_user.isToTakeHome),
+                                        isToTakeHome: Boolean(
+                                            meal_user.isToTakeHome
+                                        ),
                                         dateTime: meal_user.dateTime,
                                         imageUrl: meal_user.imageUrl,
                                         maxAmountOfParticipants:
@@ -157,7 +163,9 @@ module.exports = {
                                         lastName: meal_user.lastName,
                                         street: meal_user.street,
                                         city: meal_user.city,
-                                        isActive: Boolean(meal_user.userIsActive),
+                                        isActive: Boolean(
+                                            meal_user.userIsActive
+                                        ),
                                         emailAdress: meal_user.emailAdress,
                                         password: meal_user.password,
                                         phoneNumber: meal_user.phoneNumber,
@@ -301,21 +309,36 @@ module.exports = {
                     decoded.id,
                 ],
                 (error, results, fields) => {
-                    connection.release();
-
                     if (error) {
                         next({
                             statusCode: 500,
                             message: 'Internal servor error',
                         });
                     } else {
-                        res.status(200).json({
-                            statusCode: 200,
-                            result: {
-                                ...req.body,
-                                id: results.insertId,
-                            },
-                        });
+                        const mealId = results.insertId;
+
+                        DBConnection.query(
+                            'INSERT INTO `meal_participants_user` (mealId, userId) VALUES (?, ?);',
+                            [mealId, decoded.id],
+                            (error, results, fields) => {
+                                connection.release();
+
+                                if (error) {
+                                    next({
+                                        statusCode: 500,
+                                        message: 'Internal servor error',
+                                    });
+                                }
+
+                                res.status(200).json({
+                                    statusCode: 200,
+                                    result: {
+                                        ...req.body,
+                                        id: mealId,
+                                    },
+                                });
+                            }
+                        );
                     }
                 }
             );
