@@ -394,7 +394,7 @@ module.exports = {
                         });
                     } else if (!results.affectedRows > 0) {
                         next({
-                            statusCode: 400,
+                            statusCode: 403,
                             message: 'User does not exist',
                         });
                     } else {

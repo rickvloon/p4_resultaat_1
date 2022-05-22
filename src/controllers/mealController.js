@@ -487,4 +487,90 @@ module.exports = {
             );
         });
     },
+
+    participateMeal: (req, res, next) => {
+        const authHeader = req.headers.authorization;
+        const token = authHeader.substring(7, authHeader.length);
+        const decoded = jwt.decode(token);
+
+        DBConnection.getConnection((err, connection) => {
+            if (err) {
+                next({
+                    statusCode: 500,
+                    message: 'Internal servor error',
+                });
+                return;
+            }
+
+            connection.query(
+                'SELECT * FROM `meal_participants_user` WHERE mealId = ?',
+                req.params.id,
+                (error, results, fields) => {
+                    if (error) {
+                        return next({
+                            statusCode: 500,
+                            message: 'Internal server error',
+                        });
+                    }
+
+                    if (!results.length > 0) {
+                        return next({
+                            statusCode: 404,
+                            message: 'Meal does not exist',
+                        });
+                    }
+
+                    connection.query(
+                        'SELECT COUNT(*) as count FROM `meal_participants_user` WHERE mealId = ?',
+                        req.params.id,
+                        (error, results, fields) => {
+                            const count = results[0].count;
+
+                            connection.query(
+                                'DELETE from `meal_participants_user` WHERE userId = ? AND mealId = ?',
+                                [decoded.id, req.params.id],
+                                (error, results, fields) => {
+                                    if (error) {
+                                        return next({
+                                            statusCode: 500,
+                                            result: 'Internal servor error',
+                                        });
+                                    }
+
+                                    if (results.affectedRows > 0) {
+                                        res.status(200).json({
+                                            currentlyParticipating: false,
+                                            currentAmountOfParticipants:
+                                                count - 1,
+                                        });
+                                    } else {
+                                        connection.query(
+                                            'INSERT INTO `meal_participants_user` (userId, mealId) VALUES (?, ?);',
+                                            [decoded.id, req.params.id],
+                                            (error, results, fields) => {
+                                                connection.close();
+
+                                                if (error) {
+                                                    return next({
+                                                        statusCode: 500,
+                                                        result: 'Internal servor error',
+                                                    });
+                                                }
+
+                                                res.status(200).json({
+                                                    currentlyParticipating: true,
+                                                    currentAmountOfParticipants:
+                                                        count + 1,
+                                                });
+                                            }
+                                        );
+                                    }
+                                }
+                            );
+                        }
+                    );
+                }
+            );
+        });
+    },
 };
