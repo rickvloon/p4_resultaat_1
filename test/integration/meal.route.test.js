@@ -718,4 +718,180 @@ describe('Manage meals /api/meal/', () => {
                 });
         });
     });
+
+    describe('UC-401 sign up for meal /api/meal/:id/participate', () => {
+        it('TC-401-1 should return a 401 statuscode and error message when user is not signed in', (done) => {
+            chai.request(server)
+                .get('/api/meal/1/participate')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, 'somerandomkey')
+                )
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(401);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Unauthorized');
+
+                    done();
+                });
+        });
+
+        it('TC-401-2 should return a 404 statuscode and error message when meal does not exist', (done) => {
+            chai.request(server)
+                .get('/api/meal/9999/participate')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(404);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Meal does not exist');
+
+                    done();
+                });
+        });
+
+        it('TC-401-3 should return a valid statuscode and object after signing up', (done) => {
+            chai.request(server)
+                .get('/api/meal/2/participate')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'result');
+
+                    const { statusCode, result } = res.body;
+                    statusCode.should.be.an('number');
+
+                    result.should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'currentAmountOfParticipants',
+                            'currentlyParticipating'
+                        );
+
+                    expect(result).to.deep.equal({
+                        currentlyParticipating: true,
+                        currentAmountOfParticipants: 2,
+                    });
+
+                    done();
+                });
+        });
+    });
+
+    describe('UC-402 sign out for meal /api/meal/:id/participate', () => {
+        it('TC-402-1 should return a 401 statuscode and error message when user is not signed in', (done) => {
+            chai.request(server)
+                .get('/api/meal/1/participate')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, 'somerandomkey')
+                )
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(401);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Unauthorized');
+
+                    done();
+                });
+        });
+
+        it('TC-402-2 should return a 404 statuscode and error message when meal does not exist', (done) => {
+            chai.request(server)
+                .get('/api/meal/9999/participate')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 1 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    assert.ifError(err);
+                    res.should.have.status(404);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'message');
+
+                    const { statusCode, message } = res.body;
+                    statusCode.should.be.an('number');
+                    message.should.be
+                        .an('string')
+                        .that.contains('Meal does not exist');
+
+                    done();
+                });
+        });
+
+        it('TC-402-3 should return a valid statuscode and object after signing up', (done) => {
+            chai.request(server)
+                .get('/api/meal/1/participate')
+                .set(
+                    'authorization',
+                    'Bearer ' + jwt.sign({ id: 2 }, process.env.JWT_SECRET)
+                )
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.should.be.an('object');
+
+                    res.body.should.be
+                        .an('object')
+                        .that.has.all.keys('statusCode', 'result');
+
+                    const { statusCode, result } = res.body;
+                    statusCode.should.be.an('number');
+
+                    result.should.be
+                        .an('object')
+                        .that.has.all.keys(
+                            'currentAmountOfParticipants',
+                            'currentlyParticipating'
+                        );
+
+                    expect(result).to.deep.equal({
+                        currentlyParticipating: false,
+                        currentAmountOfParticipants: 1,
+                    });
+
+                    done();
+                });
+        });
+    });
 });

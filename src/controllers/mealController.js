@@ -539,9 +539,12 @@ module.exports = {
 
                                     if (results.affectedRows > 0) {
                                         res.status(200).json({
-                                            currentlyParticipating: false,
-                                            currentAmountOfParticipants:
-                                                count - 1,
+                                            statusCode: 200,
+                                            result: {
+                                                currentlyParticipating: false,
+                                                currentAmountOfParticipants:
+                                                    count - 1,
+                                            },
                                         });
                                     } else {
                                         connection.query(
@@ -558,9 +561,12 @@ module.exports = {
                                                 }
 
                                                 res.status(200).json({
-                                                    currentlyParticipating: true,
-                                                    currentAmountOfParticipants:
-                                                        count + 1,
+                                                    statusCode: 200,
+                                                    result: {
+                                                        currentlyParticipating: true,
+                                                        currentAmountOfParticipants:
+                                                            count + 1,
+                                                    },
                                                 });
                                             }
                                         );
