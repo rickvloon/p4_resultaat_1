@@ -13,22 +13,22 @@ module.exports = {
             description: Joi.string().required().messages({
                 'base.string': 'description is a required field',
             }),
-            isActive: Joi.boolean().messages({
+            isActive: Joi.boolean().required().messages({
                 'base.boolean': 'isActive should be a boolean',
             }),
-            isVega: Joi.boolean().messages({
+            isVega: Joi.boolean().required().messages({
                 'base.boolean': 'isVega should be a boolean',
             }),
-            isVegan: Joi.boolean().messages({
+            isVegan: Joi.boolean().required().messages({
                 'base.boolean': 'isVegan should be a boolean',
             }),
-            isToTakeHome: Joi.boolean().messages({
+            isToTakeHome: Joi.boolean().required().messages({
                 'base.boolean': 'isToTakeHome should be a boolean',
             }),
-            dateTime: Joi.string().messages({
+            dateTime: Joi.string().required().messages({
                 'base.string': 'dateTime should be a string',
             }),
-            imageUrl: Joi.string().messages({
+            imageUrl: Joi.string().required().messages({
                 'base.string': 'imageUrl should be a string',
             }),
             allergenes: Joi.array().items(Joi.string()).required().messages({
@@ -58,23 +58,23 @@ module.exports = {
         const meal = req.body;
 
         const schema = Joi.object({
-            name: Joi.string().required.messages({
+            name: Joi.string().required().messages({
                 'any.required': 'name is a required field',
             }),
             description: Joi.string().messages({
-                'base.string': 'description should be a string',
+                'base.string': 'description is a required field',
             }),
             isActive: Joi.boolean().messages({
-                'base.string': 'isActive should be a string',
+                'base.boolean': 'isActive should be a boolean',
             }),
             isVega: Joi.boolean().messages({
-                'base.string': 'isVega should be a string',
+                'base.boolean': 'isVega should be a boolean',
             }),
             isVegan: Joi.boolean().messages({
-                'base.string': 'isVegan should be a string',
+                'base.boolean': 'isVegan should be a boolean',
             }),
             isToTakeHome: Joi.boolean().messages({
-                'base.string': 'isToTakeHome should be a string',
+                'base.boolean': 'isToTakeHome should be a boolean',
             }),
             dateTime: Joi.string().messages({
                 'base.string': 'dateTime should be a string',
@@ -83,7 +83,7 @@ module.exports = {
                 'base.string': 'imageUrl should be a string',
             }),
             allergenes: Joi.array().items(Joi.string()).messages({
-                'base.string': 'allergenes should be a string',
+                'base.array': 'allergenes should be an array of strings',
             }),
             maxAmountOfParticipants: Joi.number().required().messages({
                 'any.required': 'maxAmountOfParticipants is a required field',
