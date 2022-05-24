@@ -183,7 +183,7 @@ describe('Manage meals /api/meal/', () => {
     });
 
     describe('UC-302 update meal /api/api/meal', () => {
-        it('TC-302-1 should return an error status code and message when required field is missing', (done) => {
+        it.only('TC-302-1 should return an error status code and message when required field is missing', (done) => {
             chai.request(server)
                 .put('/api/meal/1')
                 .set(

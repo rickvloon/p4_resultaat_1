@@ -58,32 +58,32 @@ module.exports = {
         const meal = req.body;
 
         const schema = Joi.object({
-            name: Joi.string().required().messages({
+            name: Joi.string().required.messages({
                 'any.required': 'name is a required field',
             }),
             description: Joi.string().messages({
                 'base.string': 'description should be a string',
             }),
-            isActive: Joi.boolean().required().messages({
-                'any.required': 'isActive is a required field',
+            isActive: Joi.boolean().messages({
+                'base.string': 'isActive should be a string',
             }),
-            isVega: Joi.boolean().required().messages({
-                'any.required': 'isVega is a required field',
+            isVega: Joi.boolean().messages({
+                'base.string': 'isVega should be a string',
             }),
-            isVegan: Joi.boolean().required().messages({
-                'any.required': 'isVegan is a required field',
+            isVegan: Joi.boolean().messages({
+                'base.string': 'isVegan should be a string',
             }),
-            isToTakeHome: Joi.boolean().required().messages({
-                'any.required': 'isToTakeHome is a required field',
+            isToTakeHome: Joi.boolean().messages({
+                'base.string': 'isToTakeHome should be a string',
             }),
-            dateTime: Joi.string().required().messages({
-                'any.required': 'dateTime is a required field',
+            dateTime: Joi.string().messages({
+                'base.string': 'dateTime should be a string',
             }),
-            imageUrl: Joi.string().required().messages({
-                'any.required': 'imageUrl is a required field',
+            imageUrl: Joi.string().messages({
+                'base.string': 'imageUrl should be a string',
             }),
-            allergenes: Joi.array().items(Joi.string()).required().messages({
-                'any.required': 'allergenes is a required field',
+            allergenes: Joi.array().items(Joi.string()).messages({
+                'base.string': 'allergenes should be a string',
             }),
             maxAmountOfParticipants: Joi.number().required().messages({
                 'any.required': 'maxAmountOfParticipants is a required field',
