@@ -310,6 +310,7 @@ module.exports = {
                 ],
                 (error, results, fields) => {
                     if (error) {
+                        console.log(error);
                         next({
                             statusCode: 500,
                             message: 'Internal servor error',
